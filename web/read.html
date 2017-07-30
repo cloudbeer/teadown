@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>teadown - a Markdown Editor</title>
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="assets/style.css">
+    <link href="http://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+</head>
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-left">
+  <i class="fa fa-coffee logo"></i>
+  <ul class="nav navbar-nav">
+   <li><a href="#"><i class="fa fa-coffee active"></i></a></li>
+   <li><a href="#"><i class="fa fa-edit"></i></a></li>
+   <li><a href="#"><i class="fa fa-gears"></i></a></li>
+  </ul>
+</div>
+<div class="container-fluid full-h">
+ <div class="row full-h">
+    <div class="col-xs-3  full-h full-w" style="background: #ccc">
+      <div class="panel-group book" id="mdBooks" role="tablist" aria-multiselectable="true">
+      </div>
+    </div>
+    <div class="col-xs-9 full-h" style="background: #fff">
+      <iframe id="ifPreview" src="preview.html"></iframe>
+    </div>
+ </div>
+</div>
+
+
+<script type="text/javascript">
+  const {ipcRenderer} = require('electron');
+  window.$ = window.jQuery = require('./assets/libs/jquery');
+
+  $(function(){
+    $(document).on("click", ".md-link", function(){
+      ipcRenderer.send('docReading', $(this).attr("data-file"));
+    });
+  });
+
+
+  const getFName = (fName) =>{
+    if (fName.indexOf(".")>0){
+      return fName.substr(0, fName.lastIndexOf("."));
+    }
+    return fName;
+  }
+
+  ipcRenderer.send('threadReading', '/Users/xiezhengwei/projects/teadown/deom-md');
+  ipcRenderer.on("threadReaded", (evt, arg)=>{
+    console.log(arg);
+    let tThread = "", mIndex=0;
+    for(let mdThread of arg.children){
+      mIndex++;
+      let bookIcon, badgeThread="";
+      if (mdThread.type === "directory"){
+        bookIcon = `<i class="fa fa-book"></i> `;
+        badgeThread = `<span class="badge">${mdThread.children.length}</span>`
+      }else{
+        bookIcon = `<i class="fa fa-bookmark-o"></i> `;
+      }
+      tThread += `<div class="panel panel-default">`;
+      tThread += `<div class="panel-heading" role="tab" id="heading${mIndex}">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse" data-parent="#mdBooks" href="#collapse${mIndex}" aria-expanded="true" aria-controls="collapse${mIndex}">
+          ${bookIcon} ${getFName(mdThread.name)} ${badgeThread}
+        </a>
+      </h4>
+    </div>`;
+
+      if (mdThread.type === "directory"){
+        tThread += `<div id="collapse${mIndex}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading${mIndex}"><div class="panel-body">`;
+        tThread += `<ul class="list-group">`;
+        for(let mdThread2 of mdThread.children){
+          tThread += `<li class="list-group-item"><i class="fa fa-bookmark-o"></i>
+          <a href="#" class="md-link" data-file="${mdThread2.path}">${getFName(mdThread2.name)}</a>
+          </li>`;
+        }
+        tThread += `</ul>`;
+        tThread += `</div></div>`;
+      }
+      tThread += `</div>`;
+    }
+    $("#mdBooks").html(tThread);
+  });
+</script>
+<script src="http://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</body>
+</html>
