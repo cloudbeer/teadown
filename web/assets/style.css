@@ -1,3 +1,6 @@
+::selection {
+  background:transparent;
+}
 .navbar-fixed-left {
   width: 42px;
   position: fixed;
@@ -12,6 +15,12 @@
 
 .navbar-fixed-left + .container-fluid {
   padding-left: 42px;
+  padding-right: 0 !important;
+}
+
+#previewWin{
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .row{
@@ -33,6 +42,7 @@ html, body{
     height:100%;
     overflow-y: auto;
 }
+.no-scroll{overflow: hidden;}
 .full-w{
     height:100%;
     padding-left: 0 !important;

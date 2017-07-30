@@ -24,7 +24,7 @@
       <div class="panel-group book" id="mdBooks" role="tablist" aria-multiselectable="true">
       </div>
     </div>
-    <div class="col-xs-9 full-h" style="background: #fff">
+    <div class="col-xs-9 full-h no-scroll" id="previewWin" style="background: #fff">
       <iframe id="ifPreview" src="preview.html"></iframe>
     </div>
  </div>
@@ -49,9 +49,11 @@
     return fName;
   }
 
+  ipcRenderer.on("previewRefreshed", (evt, arg)=>{
+    $("#ifPreview").attr("src", arg);
+  });
   ipcRenderer.send('threadReading', '/Users/xiezhengwei/projects/teadown/deom-md');
   ipcRenderer.on("threadReaded", (evt, arg)=>{
-    console.log(arg);
     let tThread = "", mIndex=0;
     for(let mdThread of arg.children){
       mIndex++;

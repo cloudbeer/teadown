@@ -12,6 +12,11 @@
   "dependencies": {
     "directory-tree": "^2.0.0",
     "electron": "^1.6.11",
-    "markdown-it": "^8.3.1"
+    "markdown-it": "^8.3.1",
+    "markdown-it-anchor": "^4.0.0",
+    "markdown-it-emoji": "^1.4.0",
+    "markdown-it-footnote": "^3.0.1",
+    "markdown-it-katex": "^2.0.3",
+    "markdown-it-table-of-contents": "^0.3.2"
   }
 }
