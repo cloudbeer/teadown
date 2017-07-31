@@ -11,13 +11,8 @@
 <body>
 
 <div class="navbar navbar-inverse navbar-fixed-left">
-  <i class="fa fa-coffee logo"></i>
-  <ul class="nav navbar-nav">
-   <li><a href="#"><i class="fa fa-coffee active"></i></a></li>
-   <li><a href="#"><i class="fa fa-edit"></i></a></li>
-   <li><a href="#"><i class="fa fa-gears"></i></a></li>
-  </ul>
 </div>
+
 <div class="container-fluid full-h">
  <div class="row full-h">
     <div class="col-xs-3  full-h full-w" style="background: #ccc">
@@ -50,7 +45,7 @@
   }
 
   ipcRenderer.on("previewRefreshed", (evt, arg)=>{
-    $("#ifPreview").attr("src", arg);
+    $("#ifPreview").attr("src", arg + "?t=" + 1*(new Date()));
   });
   ipcRenderer.send('threadReading', '/Users/xiezhengwei/projects/teadown/deom-md');
   ipcRenderer.on("threadReaded", (evt, arg)=>{
@@ -90,5 +85,6 @@
   });
 </script>
 <script src="http://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="assets/page.js"></script>
 </body>
 </html>

@@ -3,6 +3,7 @@
   const url = require('url')
   const reader = require("./app/reader");
   const fs = require("fs");
+  const uuidv4 = require('uuid/v4');
 
   let win
 
@@ -48,10 +49,18 @@
     linkify:      true,
     typographer:  true,
     highlight: function (str, lang) {
+      let uid = uuidv4().replace(/-/ig, "");
       if(lang==="mermaid"){
         return `<div class="mermaid">${str}</div>`;
       }else if (lang==="sequence"){
         return `<div class="sequence">${str}</div>`;
+      }else if (lang==="echarts"){
+        return `<div id="echarts${uid}" style="width: 800px;height:600px;"></div>
+          <script type="text/javascript">
+          var myChart${uid} = echarts.init(document.getElementById('echarts${uid}'));
+          myChart${uid}.setOption(${str});
+          </script>
+        `;
       }
     }
   });
