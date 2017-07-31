@@ -4,8 +4,19 @@
 
 features:
 
-- mermaid
-- math
+- [mermaid](https://knsv.github.io/mermaid/): Generation of diagrams and flowcharts from text in a similar manner as markdown.
+- [KaTeX](https://github.com/Khan/KaTeX)
 - emoji
-- sequence
+- [sequence](https://bramp.github.io/js-sequence-diagrams/): Turns text into UML sequence diagrams
+- [footnote](http://pandoc.org/MANUAL.html#footnotes)
+- toc: Table of Content
+
+## Editor
+
+- codemirror
+
+## next support
+
+- [echart](http://echarts.baidu.com/): 百度图表
+
 
