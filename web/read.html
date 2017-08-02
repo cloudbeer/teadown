@@ -47,7 +47,7 @@
   ipcRenderer.on("previewRefreshed", (evt, arg)=>{
     $("#ifPreview").attr("src", arg + "?t=" + 1*(new Date()));
   });
-  ipcRenderer.send('threadReading', '/Users/xiezhengwei/projects/teadown/deom-md');
+  ipcRenderer.send('threadReading', '');
   ipcRenderer.on("threadReaded", (evt, arg)=>{
     let tThread = "", mIndex=0;
     for(let mdThread of arg.children){

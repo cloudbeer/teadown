@@ -97,11 +97,9 @@
     tempString = data.toString();
   });
 
-
-
-
   ipcMain.on('threadReading', (event, arg) => {
-    const tree = dirTree(arg, {extensions:/\.md$/});
+    let mdDir = path.join(__dirname, 'demo-md');
+    const tree = dirTree(mdDir, {extensions:/\.md$/});
     event.sender.send('threadReaded', tree);
   });
 

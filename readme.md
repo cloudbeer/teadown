@@ -10,13 +10,12 @@ features:
 - [sequence](https://bramp.github.io/js-sequence-diagrams/): Turns text into UML sequence diagrams
 - [footnote](http://pandoc.org/MANUAL.html#footnotes)
 - toc: Table of Content
+- [echart](http://echarts.baidu.com/): 百度图表
 
 ## Editor
 
 - codemirror
 
 ## next support
-
-- [echart](http://echarts.baidu.com/): 百度图表
 
 
