@@ -14,19 +14,46 @@
 <div class="container-fluid full-h">
  <div class="row full-h">
     <div class="col-xs-6  full-h full-w" style="background: #ccc">
-      <div class="panel-group book" id="mdBooks" role="tablist" aria-multiselectable="true">
-      </div>
+      <div id="editor"></div>
     </div>
     <div class="col-xs-6 full-h no-scroll" id="previewWin" style="background: #fff">
-      <iframe id="ifPreview" src="preview.html"></iframe>
+      <iframe id="ifPreview" src="welcome.html"></iframe>
     </div>
  </div>
 </div>
 
 <script type="text/javascript">
   window.$ = window.jQuery = require('./assets/libs/jquery');
+  const {ipcRenderer} = require('electron');
+
+  ipcRenderer.on("previewRefreshed", (evt, arg)=>{
+    $("#ifPreview").attr("src", arg + "?t=" + 1*(new Date()));
+  });
+
 </script>
 <script src="http://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="assets/page.js"></script>
+<script src="http://cdn.bootcss.com/ace/1.2.8/ace.js"></script>
+<script src="http://cdn.bootcss.com/ace/1.2.8/mode-markdown.js"></script>
+<script>
+$(function(){
+
+    ipcRenderer.send('docReadToEdit', '');
+
+
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.getSession().setMode("ace/mode/markdown");
+
+
+    editor.on("change", (a, b)=>{
+      console.log(editor.getValue());
+    });
+
+    ipcRenderer.on("docEditReaded", (evt, arg)=>{
+      editor.insert(arg);
+    })
+});
+</script>
 </body>
 </html>

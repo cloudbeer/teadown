@@ -91,6 +91,7 @@
   }
 
   let tempString;
+  let currentDocPath, currentHtmlPath;
 
   fs.readFile(path.join(__dirname, 'web','preview.html'), (err, data) => {
     if (err) throw err;
@@ -103,16 +104,26 @@
     event.sender.send('threadReaded', tree);
   });
 
+  ipcMain.on("docReadToEdit",(event, arg) => {
+    const previewFile = path.join(myCachePath, currentHtmlPath + ".html");
+    event.sender.send("previewRefreshed", previewFile);
+    fs.readFile(currentDocPath, (err, data) => {
+      const oriData = data.toString();
+      event.sender.send('docEditReaded', oriData);
+    });
+  });
+
 
   ipcMain.on('docReading', (event, arg) => {
-    let tmpFile = Buffer.from(arg).toString('base64');
-    tmpFile = tmpFile.replace(/\//ig, "-");
+    currentDocPath = arg;
+    currentHtmlPath = Buffer.from(arg).toString('base64');
+    currentHtmlPath = currentHtmlPath.replace(/\//ig, "-");
     fs.readFile(arg, (err, data) => {
       if (err) throw err;
       const oriData = data.toString();
       let htmlData = md.render(oriData)
       htmlData = tempString.replace(/{{content}}/ig, htmlData)
-      const previewFile = path.join(myCachePath, tmpFile + ".html");
+      const previewFile = path.join(myCachePath, currentHtmlPath + ".html");
       fs.writeFile(previewFile, htmlData, { flag: 'w' }, (err) => {
         if (err) throw err;
         event.sender.send("previewRefreshed", previewFile);
