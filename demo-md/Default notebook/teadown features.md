@@ -1,4 +1,4 @@
-# teadown 特性
+# teadown features
 
 ## toc
 
@@ -20,9 +20,9 @@ Here is a footnote reference,[^1] and another.[^longnote]
 belong to the previous footnote.
 
 
-## memaid 图
+## memaid chart
 
-> code 模块，语言为 mermaid
+> code block with language of mermaid
 
 
 ```mermaid
@@ -34,9 +34,9 @@ C->> B: Response
 B->> A: Forward response
 ```
 
-## 流程图
+## sequence
 
-> code 模块，语言为 sequence
+> code block with language of sequence
 
 
 ```sequence
@@ -45,9 +45,9 @@ B->> A: Forward response
     C->>D: Open arrow
     D-->>A: Dashed open arrow
 ```
-## echarts
+## Baidu echarts
 
-> code 模块，语言为 echarts
+> code block with language of echarts
 
 ```echarts
 {
@@ -158,7 +158,7 @@ B->> A: Forward response
 
 ## emoji
 
-> 前后各一个冒号
+> begin with colon and end width colon.
 
 ```
 :person_with_blond_hair:
@@ -167,7 +167,7 @@ B->> A: Forward response
 
 ## KaTeX
 
-> 夹在 $ 中间
+> $...$
 
 ```
 $f(x) = \int_{-\infty}^\infty
@@ -181,7 +181,7 @@ $f(x) = \int_{-\infty}^\infty
 
 
 
-## code
+## code highlight
 
 ```js
 var x = 1;
