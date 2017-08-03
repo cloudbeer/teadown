@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "webpack --watch"
   },
   "author": "Xie Zhengwei <iam@xiezhengwei.com>",
   "license": "ISC",
@@ -19,5 +19,21 @@
     "markdown-it-katex": "^2.0.3",
     "markdown-it-table-of-contents": "^0.3.2",
     "uuid": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^16.0.0",
+    "@types/react-dom": "^15.5.1",
+    "autoprefixer": "^7.1.2",
+    "awesome-typescript-loader": "^3.2.2",
+    "css-loader": "^0.28.4",
+    "lost": "^8.2.0",
+    "postcss-loader": "^2.0.6",
+    "precss": "^2.0.0",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "source-map-loader": "^0.2.1",
+    "style-loader": "^0.18.2",
+    "typescript": "^2.4.2",
+    "webpack": "^3.4.1"
   }
 }
