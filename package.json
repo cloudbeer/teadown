@@ -1,7 +1,7 @@
 {
   "name": "teadown",
   "version": "0.0.1",
-  "description": "",
+  "description": "markdown editor and previewer",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -9,6 +9,15 @@
   },
   "author": "Xie Zhengwei <iam@xiezhengwei.com>",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cloudbeer/teadown"
+  },
+  "keywords": [
+    "markdown",
+    "mermaid",
+    "echarts"
+  ],
   "dependencies": {
     "directory-tree": "^2.0.0",
     "electron": "^1.6.11",
@@ -21,19 +30,21 @@
     "uuid": "^3.1.0"
   },
   "devDependencies": {
-    "@types/react": "^16.0.0",
-    "@types/react-dom": "^15.5.1",
-    "autoprefixer": "^7.1.2",
-    "awesome-typescript-loader": "^3.2.2",
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
     "css-loader": "^0.28.4",
-    "lost": "^8.2.0",
-    "postcss-loader": "^2.0.6",
-    "precss": "^2.0.0",
+    "file-loader": "^0.11.2",
+    "less": "^2.7.2",
+    "less-loader": "^4.0.5",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
+    "semantic-ui-css": "^2.2.11",
+    "semantic-ui-react": "^0.71.3",
     "source-map-loader": "^0.2.1",
     "style-loader": "^0.18.2",
-    "typescript": "^2.4.2",
+    "url-loader": "^0.5.9",
     "webpack": "^3.4.1"
   }
 }

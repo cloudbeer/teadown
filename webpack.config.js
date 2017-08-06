@@ -1,33 +1,36 @@
 module.exports = {
-  entry : "./src/index.tsx",
+  entry : "./src/index.jsx",
   output: {
     filename: "bundle.js",
     path    : __dirname + "/dist"
   },
-
+  target: 'electron-main',
   devtool: "source-map",
 
   resolve: {
-    extensions: [".ts", ".tsx", ".js", ".json"]
+    extensions: [".js", ".jsx"]
   },
 
   module: {
     rules: [
       {
-        test   : /\.css$/,
-        exclude: /node_modules/,
-        use    : [{loader: 'style-loader'},
-          {
-            loader : 'css-loader',
-            options: {
-              importLoaders: 1,
-            }
-          },
-          {
-            loader: 'postcss-loader'
-          }]
+        test: /\.less$/,
+        use: [{
+            loader: "style-loader" // creates style nodes from JS strings
+        }, {
+            loader: "css-loader" // translates CSS into CommonJS
+        }, {
+            loader: "less-loader" // compiles Less to CSS
+        }]
       },
-      {test: /\.tsx?$/, loader: "awesome-typescript-loader"},
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"]
+      },
+      {
+        test: /\.jsx$/,loader: 'babel-loader', exclude: /node_modules/
+      },
+      { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' },
       {enforce: "pre", test: /\.js$/, loader: "source-map-loader"}
     ]
   },
