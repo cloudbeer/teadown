@@ -9,5 +9,21 @@ body {
 .teadown-header {
     line-height: 32px;
     padding: 5px;
-    font-size:18px;
+    font-size: 16px;
+}
+
+.teadown-fullwin {
+    width: 100%;
+    height: calc(~"100% - 32px");
+    border: 0;
+}
+.teadown-link{
+    cursor: pointer;
+    &:hover{
+        color:#009900
+    }
+    &.active{
+        color:#009900;
+        font-weight: bold;
+    }
 }

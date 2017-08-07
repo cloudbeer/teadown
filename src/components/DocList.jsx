@@ -6,6 +6,8 @@ import {
   Accordion
 } from 'semantic-ui-react'
 
+import { ipcRenderer } from "electron";
+
 export class DocList extends React.Component {
   constructor(props) {
     super(props);
@@ -13,8 +15,12 @@ export class DocList extends React.Component {
       docs: props.docs
     }
   }
+
+  viewDocHandler(path) {
+    this.setState({ path: path });
+    ipcRenderer.send('docReading', path);
+  }
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
     this.setState(nextProps);
   }
 
@@ -27,7 +33,7 @@ export class DocList extends React.Component {
           </Grid.Column>
           <Grid.Column textAlign="right">
             <Icon name="settings" />
-            <Icon name="arrow circle left" />
+            <Icon name="arrow circle left" onClick={this.props.onHide} />
           </Grid.Column>
         </Grid.Row>
       </Grid>
@@ -43,7 +49,10 @@ export class DocList extends React.Component {
                 <List>
                   {
                     ele1.children.map((ele2, idx2) => (
-                      <List.Item key={idx2} style={{padding:"5px 13px"}}>
+                      <List.Item key={idx2} style={{ padding: "5px 13px" }}
+                        className="teadown-link"
+                        active={this.state.path === ele2.path}
+                        onClick={this.viewDocHandler.bind(this, ele2.path)}>
                         <List.Icon name='file text outline' />
                         <List.Content>
                           {ele2.name}
