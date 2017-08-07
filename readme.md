@@ -14,7 +14,7 @@ features:
 
 ## Editor
 
-- codemirror
+- ACE
 
 ## next support
 
