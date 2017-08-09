@@ -10,6 +10,8 @@ body {
     line-height: 32px;
     padding: 5px;
     font-size: 16px;
+    padding-bottom: 0 !important;
+    background: #eee;
 }
 
 .teadown-fullwin {
@@ -17,13 +19,22 @@ body {
     height: calc(~"100% - 32px");
     border: 0;
 }
-.teadown-link{
+
+.teadown-link {
     cursor: pointer;
-    &:hover{
-        color:#009900
+    &:hover {
+        color: #009900
     }
-    &.active{
-        color:#009900;
+    &.active {
+        color: #009900;
         font-weight: bold;
+    }
+}
+
+.toolbar {
+    .icon {
+        &:hover {
+            color: #009900
+        }
     }
 }
