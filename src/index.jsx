@@ -8,6 +8,12 @@ import "./assets/styles/layout.less";
 import { DocList } from "./components/DocList";
 import { Preview } from "./components/Preview";
 
+import brace from 'brace';
+import AceEditor from 'react-ace';
+
+import 'brace/mode/markdown';
+import 'brace/theme/github';
+
 import { ipcRenderer } from "electron";
 
 class TeadownLayout extends React.Component {
@@ -18,13 +24,19 @@ class TeadownLayout extends React.Component {
             height: "",
             docs: null,
             showStyle: 5,
-            previewUrl: "web/welcome.html"
+            previewUrl: "web/welcome.html",
+            source: ""
         };
+        this.srcChanged = false;
         this.getColWidth.bind(this);
     }
 
     getColWidth() {
         switch (this.state.showStyle) {
+            case 0:
+                return [0, 0, 0];
+            case 1:
+                return [4, 0, 0];
             case 2:
                 return [0, 16, 0];
             case 3:
@@ -44,7 +56,7 @@ class TeadownLayout extends React.Component {
 
     updateDimensions() {
         this.setState({
-            height: window.innerHeight + 'px'
+            height: window.innerHeight - 34 + 'px'
         });
     }
     componentDidMount() {
@@ -56,7 +68,7 @@ class TeadownLayout extends React.Component {
             this.setState({ docs: arg });
         });
         ipcRenderer.on("previewRefreshed", (evt, arg) => {
-            this.setState({ previewUrl: arg + "?t=" + 1 * (new Date()) });
+            this.setState({ previewUrl: arg.url + "?t=" + 1 * (new Date()), source: arg.source });
         });
     }
 
@@ -65,25 +77,29 @@ class TeadownLayout extends React.Component {
     }
 
     toggleList() {
-        let showStyle = ((this.state.showStyle & 1) === 1 ? this.state.showStyle & ~1 : this.state.showStyle | 1) || 5;
-        if (showStyle === 1) {
-            showStyle = 5;
-        };
+        let showStyle = ((this.state.showStyle & 1) === 1 ? this.state.showStyle & ~1 : this.state.showStyle | 1);
+        // if (showStyle === 1) {
+        //     showStyle = 5;
+        // };
         this.setState({ showStyle });
     }
     toggleEditor() {
-        let showStyle = ((this.state.showStyle & 2) === 2 ? this.state.showStyle & ~2 : this.state.showStyle | 2) || 5;
-        if (showStyle === 1) {
-            showStyle = 5;
-        };
+        let showStyle = ((this.state.showStyle & 2) === 2 ? this.state.showStyle & ~2 : this.state.showStyle | 2);
+        // if (showStyle === 1) {
+        //     showStyle = 5;
+        // };
         this.setState({ showStyle });
     }
     togglePreviewer() {
-        let showStyle = ((this.state.showStyle & 4) === 4 ? this.state.showStyle & ~4 : this.state.showStyle | 4) || 5;
-        if (showStyle === 1) {
-            showStyle = 5;
-        };
+        let showStyle = ((this.state.showStyle & 4) === 4 ? this.state.showStyle & ~4 : this.state.showStyle | 4);
+        // if (showStyle === 1) {
+        //     showStyle = 5;
+        // };
         this.setState({ showStyle });
+    }
+    onSrcChange(val) {
+        this.setState({ source: val });
+        this.srcChanged = true;
     }
 
     render() {
@@ -120,8 +136,7 @@ class TeadownLayout extends React.Component {
                         width={this.getColWidth()[0]}
                         className="teadown-container"
                         style={{
-                            height: this.state.height,
-                            borderRight: "1px solid #ccc"
+                            height: this.state.height
                         }}>
                         <DocList docs={this.state.docs} />
                     </Grid.Column> : null
@@ -131,15 +146,30 @@ class TeadownLayout extends React.Component {
                     width={this.getColWidth()[1]}
                     className="teadown-container"
                     style={{
-                        height: this.state.height
-                    }}>2</Grid.Column> : null
+                        height: this.state.height,
+                        paddingLeft: 0,
+                        paddingRight: 0
+                    }}>
+                    <AceEditor
+                        mode="markdown"
+                        theme="github"
+                        style={{ width: "100%", height: "100%" }}
+                        onChange={this.onSrcChange.bind(this)}
+                        name="tdEditor"
+                        value={this.state.source}
+                        editorProps={{ $blockScrolling: true }}
+                    />
+                </Grid.Column> : null
                 }
                 {this.getColWidth()[2] > 0 ? <Grid.Column
                     key="gPreviewer"
                     width={this.getColWidth()[2]}
                     className="teadown-container"
                     style={{
-                        height: this.state.height
+                        height: this.state.height,
+                        borderLeft: "1px solid #ccc",
+                        paddingLeft: 0,
+                        paddingRight: 0
                     }}>
                     <Preview previewUrl={this.state.previewUrl} />
                 </Grid.Column> : null
