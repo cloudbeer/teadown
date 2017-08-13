@@ -125,6 +125,21 @@
     });
   });
 
+  ipcMain.on("docSaving", (event, arg) => {
+    if (!currentDocPath) {
+      console.error("currentDocPath 没有值，要弹出窗口新建");
+    }
+    fs.writeFile(currentDocPath, arg, (err) => {
+      if (err) {
+        throw err;
+      }
+      const previewFile = path.join(myCachePath, currentHtmlPath + ".html");
+      event.sender.send("previewRefreshed", {
+        url: previewFile
+      });
+    });
+  });
+
 
   ipcMain.on('docReading', (event, arg) => {
     currentDocPath = arg;

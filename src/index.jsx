@@ -29,6 +29,17 @@ class TeadownLayout extends React.Component {
         };
         this.srcChanged = false;
         this.getColWidth.bind(this);
+        this.autoSave.bind(this)();
+    }
+
+    autoSave() {
+        setInterval(() => {
+            if (this.srcChanged) {
+                this.srcChanged = false;
+                ipcRenderer.send("docSaving", this.state.source);
+
+            }
+        }, 4000);
     }
 
     getColWidth() {
@@ -68,7 +79,11 @@ class TeadownLayout extends React.Component {
             this.setState({ docs: arg });
         });
         ipcRenderer.on("previewRefreshed", (evt, arg) => {
-            this.setState({ previewUrl: arg.url + "?t=" + 1 * (new Date()), source: arg.source });
+            let upState = { previewUrl: arg.url + "?t=" + 1 * (new Date()) };
+            if (arg.source) {
+                upState.source = arg.source;
+            }
+            this.setState(upState);
         });
     }
 

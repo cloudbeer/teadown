@@ -1,8 +1,15 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>teadown Preview</title>
 
+    <!-- HTTP 1.1 -->
+    <meta http-equiv="pragma" content="no-cache">
+    <!-- HTTP 1.0 -->
+    <meta http-equiv="cache-control" content="no-cache">
+    <!-- Prevent caching at the proxy server -->
+    <meta http-equiv="expires" content="0">
     <!-- <link rel="stylesheet" type="text/css" href="assets/md-styles/splendor.min.css"> -->
     <!-- <link href="http://cdn.bootcss.com/github-markdown-css/2.8.0/github-markdown.min.css" rel="stylesheet"> -->
     <link rel="stylesheet" type="text/css" href="assets/md-styles/amblin.css">
@@ -23,22 +30,27 @@
     <script src="http://cdn.bootcss.com/echarts/3.6.2/echarts.min.js"></script>
 
     <script>
-    $(function(){
-        mermaid.initialize({startOnLoad:true});
-        $(".sequence").sequenceDiagram({theme: 'simple'});
-    });
+        $(function () {
+            mermaid.initialize({
+                startOnLoad: true
+            });
+            $(".sequence").sequenceDiagram({
+                theme: 'simple'
+            });
+        });
     </script>
 </head>
+
 <body>
     <div id="wrapper">
-    {{content}}
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    &nbsp;
+        {{content}}
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/> &nbsp;
     </div>
 </body>
+
 </html>
