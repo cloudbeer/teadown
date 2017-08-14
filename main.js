@@ -62,12 +62,7 @@
         } else if (lang === "sequence") {
           return `<div class="sequence">${str}</div>`;
         } else if (lang === "echarts") {
-          return `<div id="echarts${uid}" style="width: 800px;height:600px;"></div>
-          <script type="text/javascript">
-          var myChart${uid} = echarts.init(document.getElementById('echarts${uid}'));
-          myChart${uid}.setOption(${str});
-          </script>
-        `;
+          return `<div id="echarts${uid}" class="echarts">${str}</div>`;
         }
       }
     });
@@ -117,8 +112,8 @@
   });
 
   ipcMain.on("docReadToEdit", (event, arg) => {
-    const previewFile = path.join(myCachePath, currentHtmlPath + ".html");
-    event.sender.send("previewRefreshed", previewFile);
+    //const previewFile = path.join(myCachePath, currentHtmlPath + ".html");
+    //event.sender.send("previewRefreshed", previewFile);
     fs.readFile(currentDocPath, (err, data) => {
       const oriData = data.toString();
       event.sender.send('docEditReaded', oriData);
@@ -129,36 +124,43 @@
     if (!currentDocPath) {
       console.error("currentDocPath 没有值，要弹出窗口新建");
     }
+    event.sender.send("previewRefreshed", {
+      oriData: arg,
+      htmlData: md.render(arg)
+    });
     fs.writeFile(currentDocPath, arg, (err) => {
       if (err) {
         throw err;
       }
-      const previewFile = path.join(myCachePath, currentHtmlPath + ".html");
-      event.sender.send("previewRefreshed", {
-        url: previewFile
-      });
     });
   });
 
 
   ipcMain.on('docReading', (event, arg) => {
     currentDocPath = arg;
-    currentHtmlPath = Buffer.from(arg).toString('base64');
-    currentHtmlPath = currentHtmlPath.replace(/\//ig, "-");
+    // currentHtmlPath = Buffer.from(arg).toString('base64');
+    // currentHtmlPath = currentHtmlPath.replace(/\//ig, "-");
     fs.readFile(arg, (err, data) => {
       if (err) throw err;
       const oriData = data.toString();
-      let htmlData = md.render(oriData)
-      htmlData = tempString.replace(/{{content}}/ig, htmlData)
-      const previewFile = path.join(myCachePath, currentHtmlPath + ".html");
-      fs.writeFile(previewFile, htmlData, {
-        flag: 'w'
-      }, (err) => {
-        if (err) throw err;
-        event.sender.send("previewRefreshed", {
-          url: previewFile,
-          source: oriData
-        });
+      const htmlData = md.render(oriData);
+
+      event.sender.send("previewRefreshed", {
+        //url: previewFile,
+        source: oriData,
+        htmlData: htmlData
       });
+
+      // htmlData = tempString.replace(/{{content}}/ig, htmlData)
+      // const previewFile = path.join(myCachePath, currentHtmlPath + ".html");
+      // fs.writeFile(previewFile, htmlData, {
+      //   flag: 'w'
+      // }, (err) => {
+      //   if (err) throw err;
+      //   event.sender.send("previewRefreshed", {
+      //     url: previewFile,
+      //     source: oriData
+      //   });
+      // });
     });
   });

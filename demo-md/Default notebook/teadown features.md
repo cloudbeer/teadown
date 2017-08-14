@@ -1,4 +1,5 @@
-# teadown features
+# teadown features 哼呵呵
+
 
 ## toc
 
@@ -34,17 +35,6 @@ C->> B: Response
 B->> A: Forward response
 ```
 
-## sequence
-
-> code block with language of sequence
-
-
-```sequence
-    A->B: Normal line
-    B-->C: Dashed line
-    C->>D: Open arrow
-    D-->>A: Dashed open arrow
-```
 ## Baidu echarts
 
 > code block with language of echarts
@@ -73,7 +63,7 @@ B->> A: Forward response
 ```echarts
 {
     title : {
-        text: '南丁格尔玫瑰图',
+        text: '南丁格尔玫瑰图2',
         subtext: '纯属虚构',
         x:'center'
     },
@@ -163,11 +153,13 @@ B->> A: Forward response
 ```
 :person_with_blond_hair:
 ```
-:person_with_blond_hair::man_with_gua_pi_mao::man_with_turban::construction_worker::cop::angel::princess::smiley_cat::smile_cat::heart_eyes_cat:
+:person_with_blond_hair:
+:man_with_gua_pi_mao::man_with_turban::construction_worker:
+:cop::angel::princess::smiley_cat::heart_eyes_cat:
 
 ## KaTeX
 
-> $...$
+> `$...$`
 
 ```
 $f(x) = \int_{-\infty}^\infty

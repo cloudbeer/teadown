@@ -16,6 +16,9 @@ import 'brace/theme/github';
 
 import { ipcRenderer } from "electron";
 
+const mermaid = require("mermaid");
+const echarts = require('echarts');
+
 class TeadownLayout extends React.Component {
 
     constructor(props) {
@@ -25,7 +28,10 @@ class TeadownLayout extends React.Component {
             docs: null,
             showStyle: 5,
             previewUrl: "web/welcome.html",
-            source: ""
+            source: "",
+            htmlData: `<h1 style="padding:20px">
+            Welcome use teadown, click a doc to begin.
+            </h1>`
         };
         this.srcChanged = false;
         this.getColWidth.bind(this);
@@ -37,7 +43,6 @@ class TeadownLayout extends React.Component {
             if (this.srcChanged) {
                 this.srcChanged = false;
                 ipcRenderer.send("docSaving", this.state.source);
-
             }
         }, 4000);
     }
@@ -70,6 +75,15 @@ class TeadownLayout extends React.Component {
             height: window.innerHeight - 34 + 'px'
         });
     }
+    loadEcharts() {
+        let mycharts = document.getElementsByClassName('echarts');
+        for (let chart of mycharts) {
+            const content = chart.innerHTML;
+            let mychart = echarts.init(chart);
+            const myContent = new Function("return " + content)();
+            mychart.setOption(myContent);
+        }
+    }
     componentDidMount() {
         this.updateDimensions();
         window.addEventListener("resize", this.updateDimensions.bind(this));
@@ -83,7 +97,18 @@ class TeadownLayout extends React.Component {
             if (arg.source) {
                 upState.source = arg.source;
             }
-            this.setState(upState);
+            if (arg.htmlData) {
+                upState.htmlData = arg.htmlData;
+            }
+            this.setState(upState, () => {
+                mermaid.init({ noteMargin: 10 }, ".mermaid");
+                this.loadEcharts.bind(this)();
+            });
+        });
+
+
+        mermaid.initialize({
+            startOnLoad: true
         });
     }
 
@@ -118,7 +143,7 @@ class TeadownLayout extends React.Component {
     }
 
     render() {
-        const highlight = "red", normalCl = "black";
+        const highlight = "olive", normalCl = "black";
         const listIconColor = (this.state.showStyle & 1) === 1 ? highlight : normalCl;
         const editorIconColor = (this.state.showStyle & 2) === 2 ? highlight : normalCl;
         const browserIconColor = (this.state.showStyle & 4) === 4 ? highlight : normalCl;
@@ -179,14 +204,15 @@ class TeadownLayout extends React.Component {
                 {this.getColWidth()[2] > 0 ? <Grid.Column
                     key="gPreviewer"
                     width={this.getColWidth()[2]}
-                    className="teadown-container"
+                    className="teadown-previewer"
                     style={{
                         height: this.state.height,
-                        borderLeft: "1px solid #ccc",
-                        paddingLeft: 0,
-                        paddingRight: 0
-                    }}>
-                    <Preview previewUrl={this.state.previewUrl} />
+                        borderLeft: "1px solid #ccc"
+                    }}
+                >
+                    <div className="markdown-body"
+                        dangerouslySetInnerHTML={{ __html: this.state.htmlData }}></div>
+                    {/* <Preview previewUrl={this.state.previewUrl} /> */}
                 </Grid.Column> : null
                 }
             </Grid.Row>
