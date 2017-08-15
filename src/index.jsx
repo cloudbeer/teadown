@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import { Grid, Icon, Popup } from 'semantic-ui-react'
+import { Grid, Icon, Popup, Modal, Button, Header, Form, Input } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css';
 
 import "./assets/styles/layout.less";
@@ -31,11 +31,15 @@ class TeadownLayout extends React.Component {
             source: "",
             htmlData: `<h1 style="padding:20px">
             Welcome use teadown, click a doc to begin.
-            </h1>`
+            </h1>`,
+            settingsOpen: false
         };
         this.srcChanged = false;
         this.getColWidth.bind(this);
         this.autoSave.bind(this)();
+    }
+    closeSettings() {
+        this.setState({ settingsOpen: false });
     }
 
     autoSave() {
@@ -101,15 +105,17 @@ class TeadownLayout extends React.Component {
                 upState.htmlData = arg.htmlData;
             }
             this.setState(upState, () => {
-                mermaid.init({ noteMargin: 10 }, ".mermaid");
-                this.loadEcharts.bind(this)();
+                // mermaid.init({ noteMargin: 10 }, ".mermaid");
+                // this.loadEcharts.bind(this)();
             });
         });
-
-
         mermaid.initialize({
             startOnLoad: true
         });
+    }
+    componentDidUpdate() {
+        mermaid.init({ noteMargin: 10 }, ".mermaid");
+        this.loadEcharts.bind(this)();
     }
 
     componentWillUnmount() {
@@ -163,7 +169,8 @@ class TeadownLayout extends React.Component {
                     <Popup content="Export PDF" basic
                         trigger={<Icon name="file pdf outline" />} />
                     <Popup content="Settings" basic
-                        trigger={<Icon name="settings" />} />
+                        trigger={<Icon name="settings"
+                            onClick={() => { this.setState({ settingsOpen: true }) }} />} />
                     <Popup content="Help" basic
                         trigger={<Icon name="help" />} />
 
@@ -194,7 +201,7 @@ class TeadownLayout extends React.Component {
                         mode="markdown"
                         theme="github"
                         showPrintMargin={false}
-                        fontSize={14}
+                        fontSize={16}
                         wrapEnabled={true}
                         style={{ width: "100%", height: "100%" }}
                         onChange={this.onSrcChange.bind(this)}
@@ -220,6 +227,65 @@ class TeadownLayout extends React.Component {
                 </Grid.Column> : null
                 }
             </Grid.Row>
+
+            <Modal dimmer="blurring" open={this.state.settingsOpen} onClose={this.closeSettings.bind(this)}>
+                <Modal.Header>Settings</Modal.Header>
+                <Modal.Content>
+                    <Modal.Description>
+                        <Form>
+                            <Header>System</Header>
+                            <Form.Group widths='equal'>
+                                <Form.Field>
+                                    <label>Document folder</label>
+                                    <Input placeholder='Document folder' />
+                                </Form.Field>
+                                <Form.Field>
+                                    <label>Auto save interval</label>
+                                    <Input placeholder='Auto save interval' />
+                                </Form.Field>
+                            </Form.Group>
+                            <Header>Editor</Header>
+                            <Form.Group widths='equal'>
+                                <Form.Field>
+                                    <label>Keyboard schema</label>
+                                    <Input placeholder='Document folder' />
+                                </Form.Field>
+                                <Form.Field>
+                                    <label>Theme</label>
+                                    <Input placeholder='Document folder' />
+                                </Form.Field>
+                            </Form.Group>
+                            <Form.Group widths='equal'>
+                                <Form.Field>
+                                    <label>Font family</label>
+                                    <Input placeholder='Font family' />
+                                </Form.Field>
+                                <Form.Field>
+                                    <label>Font size</label>
+                                    <Input placeholder='Font size' />
+                                </Form.Field>
+                            </Form.Group>
+                            <Header>Previewer</Header>
+                            <Form.Group widths='equal'>
+                                <Form.Field>
+                                    <label>Theme</label>
+                                    <Input placeholder='Theme' />
+                                </Form.Field>
+                                <Form.Field>
+                                    <label>Background</label>
+                                    <Input placeholder='Document folder' />
+                                </Form.Field>
+                            </Form.Group>
+                        </Form>
+                    </Modal.Description>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button color='black' onClick={this.closeSettings.bind(this)}>
+                        Nope
+            </Button>
+                    <Button positive icon='checkmark' labelPosition='right' content="Yep, that's me" onClick={this.close} />
+                </Modal.Actions>
+            </Modal>
         </Grid>
     }
 }

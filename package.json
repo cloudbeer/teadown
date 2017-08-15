@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "webpack --watch"
+    "build": "webpack",
+    "dev": "webpack --watch"
   },
   "author": "Xie Zhengwei <iam@xiezhengwei.com>",
   "license": "ISC",

@@ -80,7 +80,10 @@ B->> A: Forward response
         show : true,
         feature : {
             mark : {show: true},
-            dataView : {show: true, readOnly: false},
+            dataView : {
+                show: true, readOnly: false
+                
+            },
             magicType : {
                 show: true,
                 type: ['pie', 'funnel']
