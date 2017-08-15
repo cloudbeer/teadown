@@ -1,0 +1,58 @@
+body {
+  overflow: hidden;
+  background: #666;
+}
+.logo {
+  transform: rotate(-135deg);
+}
+.ui.grid {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.row {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.teadown-header {
+  line-height: 32px;
+  font-size: 16px;
+  padding: 0 !important;
+  background: #eee;
+}
+.teadown-container {
+  background: #fff;
+}
+.teadown-previewer {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 20px;
+  background: #fff;
+  overflow: auto;
+}
+.teadown-fullwin {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+teadown-ace {
+  font-family: "Droid Sans Mono", monospace, "兰亭黑-简 纤黑", "微软雅黑", "Microsoft YaHei";
+}
+.teadown-link {
+  cursor: pointer;
+}
+.teadown-link:hover {
+  color: #009900;
+}
+.teadown-link.active {
+  color: #009900;
+  font-weight: bold;
+}
+.toolbar .icon:hover {
+  color: #009900;
+}
+/*** content styles ****/
+.echarts {
+  width: 800px;
+  height: 600px;
+}

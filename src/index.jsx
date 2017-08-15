@@ -193,9 +193,13 @@ class TeadownLayout extends React.Component {
                     <AceEditor
                         mode="markdown"
                         theme="github"
+                        showPrintMargin={false}
+                        fontSize={14}
+                        wrapEnabled={true}
                         style={{ width: "100%", height: "100%" }}
                         onChange={this.onSrcChange.bind(this)}
                         name="tdEditor"
+                        className="teadown-ace"
                         value={this.state.source}
                         editorProps={{ $blockScrolling: true }}
                     />
