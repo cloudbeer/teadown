@@ -24,6 +24,10 @@ class TeadownLayout extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            settings: {
+                docRoot: "",
+                autoSaveInteval: 4,
+            },
             height: "",
             docs: null,
             showStyle: 5,
@@ -36,10 +40,34 @@ class TeadownLayout extends React.Component {
         };
         this.srcChanged = false;
         this.getColWidth.bind(this);
+        this.onSettingChanged.bind(this);
         this.autoSave.bind(this)();
+
+
+        ipcRenderer.send('threadReading', '');
+        ipcRenderer.on("threadReaded", (evt, arg) => {
+            this.setState({ docs: arg });
+        });
+        ipcRenderer.on("previewRefreshed", (evt, arg) => {
+            let upState = { previewUrl: arg.url + "?t=" + 1 * (new Date()) };
+            if (arg.source) {
+                upState.source = arg.source;
+            }
+            if (arg.htmlData) {
+                upState.htmlData = arg.htmlData;
+            }
+            this.setState(upState);
+        });
+        ipcRenderer.on("onFolderChosen", (evt, arg) => {
+            let settings = this.state.settings;
+            settings.docRoot = arg;
+            this.setState({ settings: settings });
+        });
+
     }
-    closeSettings() {
-        this.setState({ settingsOpen: false });
+
+    onBrowseFolderClick() {
+        ipcRenderer.send("onBrowseFolderClick", "");
     }
 
     autoSave() {
@@ -48,7 +76,7 @@ class TeadownLayout extends React.Component {
                 this.srcChanged = false;
                 ipcRenderer.send("docSaving", this.state.source);
             }
-        }, 4000);
+        }, this.state.settings.autoSaveInteval * 1000);
     }
 
     getColWidth() {
@@ -92,23 +120,7 @@ class TeadownLayout extends React.Component {
         this.updateDimensions();
         window.addEventListener("resize", this.updateDimensions.bind(this));
 
-        ipcRenderer.send('threadReading', '');
-        ipcRenderer.on("threadReaded", (evt, arg) => {
-            this.setState({ docs: arg });
-        });
-        ipcRenderer.on("previewRefreshed", (evt, arg) => {
-            let upState = { previewUrl: arg.url + "?t=" + 1 * (new Date()) };
-            if (arg.source) {
-                upState.source = arg.source;
-            }
-            if (arg.htmlData) {
-                upState.htmlData = arg.htmlData;
-            }
-            this.setState(upState, () => {
-                // mermaid.init({ noteMargin: 10 }, ".mermaid");
-                // this.loadEcharts.bind(this)();
-            });
-        });
+
         mermaid.initialize({
             startOnLoad: true
         });
@@ -146,6 +158,21 @@ class TeadownLayout extends React.Component {
     onSrcChange(val) {
         this.setState({ source: val });
         this.srcChanged = true;
+    }
+    onSettingChanged(k, v) {
+        let settings = this.state.settings;
+        settings[k] = v;
+        if (k === "autoSaveInteval") {
+            v = parseInt(v) || 4;
+        }
+        this.setState({ settings: settings });
+    }
+    saveSettings() {
+        ipcRenderer.send("onSettingChanged", this.state.settings);
+        this.setState({ settingsOpen: false });
+    }
+    closeSettings() {
+        this.setState({ settingsOpen: false });
     }
 
     render() {
@@ -237,11 +264,12 @@ class TeadownLayout extends React.Component {
                             <Form.Group widths='equal'>
                                 <Form.Field>
                                     <label>Document folder</label>
-                                    <Input placeholder='Document folder' />
+                                    <Input value={this.state.settings.docRoot}
+                                        icon={<Icon onClick={this.onBrowseFolderClick.bind(this)} name='search' inverted circular link />} />
                                 </Form.Field>
                                 <Form.Field>
-                                    <label>Auto save interval</label>
-                                    <Input placeholder='Auto save interval' />
+                                    <label>Auto save inteval</label>
+                                    <Input value={this.state.settings.autoSaveInteval} onChange={(evt, val) => { this.onSettingChanged("autoSaveInteval", val.value) }} />
                                 </Form.Field>
                             </Form.Group>
                             <Header>Editor</Header>
@@ -280,10 +308,8 @@ class TeadownLayout extends React.Component {
                     </Modal.Description>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button color='black' onClick={this.closeSettings.bind(this)}>
-                        Nope
-            </Button>
-                    <Button positive icon='checkmark' labelPosition='right' content="Yep, that's me" onClick={this.close} />
+                    <Button color='black' onClick={this.closeSettings.bind(this)}>Cancel</Button>
+                    <Button positive icon='save' labelPosition='right' content="Save" onClick={this.saveSettings.bind(this)} />
                 </Modal.Actions>
             </Modal>
         </Grid>
