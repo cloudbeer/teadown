@@ -14,7 +14,12 @@ module.exports = {
   },
 
   plugins: [
+    new webpack.DllReferencePlugin({
+        context: __dirname,
+        manifest: require('./dist/manifest.json'),
+    }),
     //new webpack.optimize.UglifyJsPlugin({minimize: true})
+    
   ],
   module: {
     rules: [
@@ -41,8 +46,8 @@ module.exports = {
   },
 
 
-  externals: {
-    "react"    : "React",
-    "react-dom": "ReactDOM"
-  },
+  // externals: {
+  //   "react"    : "React",
+  //   "react-dom": "ReactDOM"
+  // },
 };

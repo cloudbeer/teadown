@@ -66,9 +66,6 @@ class TeadownLayout extends React.Component {
 
     }
 
-    onBrowseFolderClick() {
-        ipcRenderer.send("onBrowseFolderClick", "");
-    }
 
     autoSave() {
         setInterval(() => {
@@ -136,23 +133,14 @@ class TeadownLayout extends React.Component {
 
     toggleList() {
         let showStyle = ((this.state.showStyle & 1) === 1 ? this.state.showStyle & ~1 : this.state.showStyle | 1);
-        // if (showStyle === 1) {
-        //     showStyle = 5;
-        // };
         this.setState({ showStyle });
     }
     toggleEditor() {
         let showStyle = ((this.state.showStyle & 2) === 2 ? this.state.showStyle & ~2 : this.state.showStyle | 2);
-        // if (showStyle === 1) {
-        //     showStyle = 5;
-        // };
         this.setState({ showStyle });
     }
     togglePreviewer() {
         let showStyle = ((this.state.showStyle & 4) === 4 ? this.state.showStyle & ~4 : this.state.showStyle | 4);
-        // if (showStyle === 1) {
-        //     showStyle = 5;
-        // };
         this.setState({ showStyle });
     }
     onSrcChange(val) {
@@ -167,13 +155,19 @@ class TeadownLayout extends React.Component {
         }
         this.setState({ settings: settings });
     }
-    saveSettings() {
+
+    onSettingsSave() {
         ipcRenderer.send("onSettingChanged", this.state.settings);
         this.setState({ settingsOpen: false });
     }
-    closeSettings() {
+    onSettingsClose() {
         this.setState({ settingsOpen: false });
     }
+    
+    onBrowseFolderClick() {
+        ipcRenderer.send("onBrowseFolderClick", "");
+    }
+
 
     render() {
         const highlight = "olive", normalCl = "black";
@@ -255,7 +249,7 @@ class TeadownLayout extends React.Component {
                 }
             </Grid.Row>
 
-            <Modal dimmer="blurring" open={this.state.settingsOpen} onClose={this.closeSettings.bind(this)}>
+            <Modal dimmer="blurring" open={this.state.settingsOpen} onClose={this.onSettingsClose.bind(this)}>
                 <Modal.Header>Settings</Modal.Header>
                 <Modal.Content>
                     <Modal.Description>
@@ -308,8 +302,8 @@ class TeadownLayout extends React.Component {
                     </Modal.Description>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button color='black' onClick={this.closeSettings.bind(this)}>Cancel</Button>
-                    <Button positive icon='save' labelPosition='right' content="Save" onClick={this.saveSettings.bind(this)} />
+                    <Button color='black' onClick={this.onSettingsClose.bind(this)}>Cancel</Button>
+                    <Button positive icon='save' labelPosition='right' content="Save" onClick={this.onSettingsSave.bind(this)} />
                 </Modal.Actions>
             </Modal>
         </Grid>

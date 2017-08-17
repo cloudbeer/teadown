@@ -6,13 +6,12 @@ const {
 } = require('electron');
 const path = require('path');
 const url = require('url');
-const reader = require("./app/reader");
 const fs = require("fs");
 const uuidv4 = require('uuid/v4');
 
 let win;
 const dirTree = require('directory-tree');
-let tempString;
+// let tempString;
 let currentDocPath, currentHtmlPath, docRoot;
 let appConfig = {
   docRoot: path.join(__dirname, 'demo-md'),
@@ -25,7 +24,7 @@ function createWindow() {
   win = new BrowserWindow({
     width: 1024,
     height: 768,
-    icon: path.join(__dirname, 'web/assets/logo.png')
+    icon: path.join(__dirname, 'logo.png')
   })
 
 
@@ -34,7 +33,7 @@ function createWindow() {
     protocol: 'file:',
     slashes: true
   }))
-  win.webContents.openDevTools();
+  //win.webContents.openDevTools();
 
   win.on('closed', () => {
     win = null
@@ -123,10 +122,10 @@ const loadFileTree = (event)=>{
   event.sender.send('threadReaded', tree);
 }
 
-fs.readFile(path.join(__dirname, 'web', 'preview.html'), (err, data) => {
-  if (err) throw err;
-  tempString = data.toString();
-});
+// fs.readFile(path.join(__dirname, 'web', 'preview.html'), (err, data) => {
+//   if (err) throw err;
+//   tempString = data.toString();
+// });
 
 ipcMain.on("onSettingChanged", (event, arg) => {
   appConfig = arg;
