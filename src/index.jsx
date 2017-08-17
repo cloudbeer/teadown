@@ -5,7 +5,7 @@ import { Grid, Icon, Popup, Modal, Button, Header, Form, Input } from 'semantic-
 import 'semantic-ui-css/semantic.min.css';
 
 import "./assets/styles/layout.less";
-import { DocList } from "./components/DocList";
+//import { DocList } from "./components/DocList";
 import { Preview } from "./components/Preview";
 
 import brace from 'brace';
@@ -13,6 +13,20 @@ import AceEditor from 'react-ace';
 
 import 'brace/mode/markdown';
 import 'brace/theme/github';
+
+
+import { Treebeard, theme } from 'react-treebeard';
+theme.tree.base.backgroundColor = "#fff";
+theme.tree.base.color = "#000";
+theme.tree.node.header.base.color = "#000";
+theme.tree.node.activeLink.background = "#eee";
+theme.tree.node.header.title.lineHeight = "2.5em";
+theme.tree.node.header.title.whiteSpace = "nowrap";
+theme.tree.node.header.title.paddingLeft = "1.5em";
+theme.tree.node.toggle.base.position = "absolute";
+theme.tree.node.toggle.base.top = "0.4em";
+
+
 
 import { ipcRenderer } from "electron";
 
@@ -29,14 +43,15 @@ class TeadownLayout extends React.Component {
                 autoSaveInteval: 4,
             },
             height: "",
-            docs: null,
+            docs: {},
             showStyle: 5,
             previewUrl: "web/welcome.html",
             source: "",
             htmlData: `<h1 style="padding:20px">
-            Welcome use teadown, click a doc to begin.
+            teadown, a shy boy.
             </h1>`,
-            settingsOpen: false
+            settingsOpen: false,
+            cursor: null
         };
         this.srcChanged = false;
         this.getColWidth.bind(this);
@@ -46,6 +61,7 @@ class TeadownLayout extends React.Component {
 
         ipcRenderer.send('threadReading', '');
         ipcRenderer.on("threadReaded", (evt, arg) => {
+            arg.toggled = true;
             this.setState({ docs: arg });
         });
         ipcRenderer.on("previewRefreshed", (evt, arg) => {
@@ -65,7 +81,6 @@ class TeadownLayout extends React.Component {
         });
 
     }
-
 
     autoSave() {
         setInterval(() => {
@@ -91,9 +106,9 @@ class TeadownLayout extends React.Component {
             case 5:
                 return [4, 0, 12];
             case 6:
-                return [0, 8, 8];
+                return [0, 9, 7];
             case 7:
-                return [4, 6, 6];
+                return [3, 7, 6];
             default:
                 return [4, 0, 12];
         }
@@ -163,11 +178,19 @@ class TeadownLayout extends React.Component {
     onSettingsClose() {
         this.setState({ settingsOpen: false });
     }
-    
+
     onBrowseFolderClick() {
         ipcRenderer.send("onBrowseFolderClick", "");
     }
-
+    onDocToggle(node, toggled) {
+        if (this.state.cursor) { this.state.cursor.active = false; }
+        node.active = true;
+        if (node.children) { node.toggled = toggled; }
+        this.setState({ cursor: node });
+        if (node.type === "file" && node.extension === ".md") {
+            ipcRenderer.send('docReading', node.path);
+        }
+    }
 
     render() {
         const highlight = "olive", normalCl = "black";
@@ -177,7 +200,8 @@ class TeadownLayout extends React.Component {
         return <Grid>
             <Grid.Row className="teadown-header">
                 <Grid.Column width={4} >
-                    <Icon name="coffee" size="big" color="green" /> teadown
+                    <Icon name="coffee" size="small" color="green" className="logo" />
+                    <span style={{ fontSize: "18px" }}> teadown</span> <span>write & read markdown relax</span>
                 </Grid.Column>
                 <Grid.Column textAlign="right" width={12} className="toolbar">
                     <Popup content="Switch Doc list on/off" basic
@@ -204,9 +228,14 @@ class TeadownLayout extends React.Component {
                         width={this.getColWidth()[0]}
                         className="teadown-container"
                         style={{
-                            height: this.state.height
+                            height: this.state.height,
+                            overflow: "auto"
                         }}>
-                        <DocList docs={this.state.docs} />
+                        <Treebeard
+                            style={theme}
+                            data={this.state.docs}
+                            onToggle={this.onDocToggle.bind(this)}
+                        />
                     </Grid.Column> : null
                 }
                 {this.getColWidth()[1] > 0 ? <Grid.Column
