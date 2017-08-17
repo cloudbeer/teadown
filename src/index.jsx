@@ -6,13 +6,17 @@ import 'semantic-ui-css/semantic.min.css';
 
 import "./assets/styles/layout.less";
 //import { DocList } from "./components/DocList";
-import { Preview } from "./components/Preview";
+// import { Preview } from "./components/Preview";
 
-import brace from 'brace';
-import AceEditor from 'react-ace';
+// import brace from 'brace';
+// import AceEditor from 'react-ace';
 
-import 'brace/mode/markdown';
-import 'brace/theme/github';
+// import 'brace/mode/markdown';
+// import 'brace/theme/github';
+
+
+const CodeMirror = require('react-codemirror');
+require('codemirror/mode/markdown/markdown');
 
 
 import { Treebeard, theme } from 'react-treebeard';
@@ -47,9 +51,9 @@ class TeadownLayout extends React.Component {
             showStyle: 5,
             previewUrl: "web/welcome.html",
             source: "",
-            htmlData: `<h1 style="padding:20px">
-            teadown, a shy boy.
-            </h1>`,
+            htmlData: `<div style="padding:20px;font-size:20px">
+            teadown is a Markdown Editor and Previewer
+            </div>`,
             settingsOpen: false,
             cursor: null
         };
@@ -247,7 +251,16 @@ class TeadownLayout extends React.Component {
                         paddingLeft: 0,
                         paddingRight: 0
                     }}>
-                    <AceEditor
+                    <CodeMirror
+                        value={this.state.source}
+                        onChange={this.onSrcChange.bind(this)}
+                        className="teadown-editor"
+                        options={{
+                            lineNumbers: true,
+                            mode: "markdown",
+                            matchBrackets: true
+                        }} />
+                    {/* <AceEditor
                         mode="markdown"
                         theme="github"
                         showPrintMargin={false}
@@ -259,7 +272,7 @@ class TeadownLayout extends React.Component {
                         className="teadown-ace"
                         value={this.state.source}
                         editorProps={{ $blockScrolling: true }}
-                    />
+                    /> */}
                 </Grid.Column> : null
                 }
                 {this.getColWidth()[2] > 0 ? <Grid.Column

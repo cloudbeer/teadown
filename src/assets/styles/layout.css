@@ -35,8 +35,8 @@ body {
   height: 100%;
   border: 0;
 }
-teadown-ace {
-  font-family: "Droid Sans Mono", monospace, "兰亭黑-简 纤黑", "微软雅黑", "Microsoft YaHei";
+.teadown-ace {
+  font-family: "Droid Sans Mono", monospace, "兰亭黑-简 纤黑", "微软雅黑", "Microsoft YaHei" !important;
 }
 .teadown-link {
   cursor: pointer;
@@ -48,6 +48,10 @@ teadown-ace {
   color: #009900;
   font-weight: bold;
 }
+.teadown-editor {
+  height: 100%;
+  font-family: "Droid Sans Mono", monospace, "兰亭黑-简 纤黑", "微软雅黑", "Microsoft YaHei" !important;
+}
 .toolbar .icon:hover {
   color: #009900;
 }
@@ -55,4 +59,12 @@ teadown-ace {
 .echarts {
   width: 800px;
   height: 600px;
+}
+.CodeMirror {
+  height: 100%;
+  border: 0;
+}
+.CodeMirror pre {
+  padding-left: 7px;
+  line-height: 1.25;
 }
