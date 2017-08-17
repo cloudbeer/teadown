@@ -1,9 +1,12 @@
 # teadown is a Markdown Editor and Previewer
+## For writers
 
-## run it
+Download, install and run it.
+
+## For you developers
 
 Execute the followings: 
-- package venders assets
+- package venders assets
 - package project assets
 - run app
 
