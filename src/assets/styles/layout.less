@@ -1,10 +1,20 @@
+@font-face {
+    font-family: 'teadown-icon';  /* project id 389482 */
+    src: url('http://at.alicdn.com/t/font_389482_auaa5m75nr110pb9.eot');
+    src: url('http://at.alicdn.com/t/font_389482_auaa5m75nr110pb9.eot?#iefix') format('embedded-opentype'),
+    url('http://at.alicdn.com/t/font_389482_auaa5m75nr110pb9.woff') format('woff'),
+    url('http://at.alicdn.com/t/font_389482_auaa5m75nr110pb9.ttf') format('truetype'),
+    url('http://at.alicdn.com/t/font_389482_auaa5m75nr110pb9.svg#teadown-icon') format('svg');
+  }
+
 body {
     overflow: hidden;
     background: #666;
 }
 
 .logo {
-    transform: rotate(-135deg);
+    font-weight: bolder !important;
+    font-size:24px !important
 }
 
 .ui.grid {
@@ -21,11 +31,14 @@ body {
     line-height: 32px;
     font-size: 16px;
     padding: 0 !important;
-    background: #eee;
+    background: #DFFFE6;
+    color: #005011;
+    font-size: 20px;
 }
 
 .teadown-container {
     background: #fff;
+    padding: 0 !important;
 }
 
 .teadown-previewer {
@@ -35,6 +48,11 @@ body {
     padding: 20px;
     background: #fff;
     overflow: auto;
+}
+.teadown-splitter{
+    display: inline-block;
+    color: #B7B7B7;
+    padding: 0 4px;
 }
 
 .teadown-fullwin {
@@ -59,7 +77,6 @@ body {
 
 .teadown-editor{
     height: 100%;
-    font-family: "Droid Sans Mono", monospace,"兰亭黑-简 纤黑", "微软雅黑", "Microsoft YaHei" !important
 }
 
 .toolbar {
@@ -79,5 +96,60 @@ body {
 }
 
 
-.CodeMirror { height: 100%; border: 0; }
-.CodeMirror pre { padding-left: 7px; line-height: 1.25; }
+.CodeMirror { height: 100%; border: 0;
+    pre { 
+        padding-left: 7px; line-height: 1.25;     
+        font-family: "Droid Sans Mono", monospace,"兰亭黑-简 纤黑", "微软雅黑", "Microsoft YaHei" !important
+    }
+    .cm-header {
+        font-weight: bold;
+        &.cm-header-1{
+            font-size: 28px;
+        }
+        &.cm-header-2{
+            font-size: 24px;
+        }
+        &.cm-header-3{
+            font-size: 20px;
+        }
+        &.cm-header-4{
+            font-size: 18px;
+        }
+        &.cm-header-5{
+            font-size: 16px;
+        }
+        &.cm-header-6{
+            font-size: 14px;
+        }
+    }
+}
+
+i.teadown.icon {
+    font-family: 'teadown-icon' !important;
+}
+i.icon.teadown{
+    &.wrap:before {
+        content: "\e940";
+    }
+    &.tea:before {
+        content: "\e603";
+    }
+    &.default:before {
+        content: "\e775";
+    }
+    &.sublime:before {
+        content: "\e604";
+    }
+    &.emacs:before {
+        content: "\e602";
+    }
+    &.vim:before {
+        content: "\e614";
+    }
+    &.light:before {
+        content: "\e74e";
+    }
+    &.dark:before {
+        content: "\e64e";
+    }
+}

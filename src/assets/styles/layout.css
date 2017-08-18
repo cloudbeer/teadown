@@ -1,9 +1,16 @@
+@font-face {
+  font-family: 'teadown-icon';
+  /* project id 389482 */
+  src: url('http://at.alicdn.com/t/font_389482_auaa5m75nr110pb9.eot');
+  src: url('http://at.alicdn.com/t/font_389482_auaa5m75nr110pb9.eot?#iefix') format('embedded-opentype'), url('http://at.alicdn.com/t/font_389482_auaa5m75nr110pb9.woff') format('woff'), url('http://at.alicdn.com/t/font_389482_auaa5m75nr110pb9.ttf') format('truetype'), url('http://at.alicdn.com/t/font_389482_auaa5m75nr110pb9.svg#teadown-icon') format('svg');
+}
 body {
   overflow: hidden;
   background: #666;
 }
 .logo {
-  transform: rotate(-135deg);
+  font-weight: bolder !important;
+  font-size: 24px !important;
 }
 .ui.grid {
   padding: 0 !important;
@@ -17,10 +24,13 @@ body {
   line-height: 32px;
   font-size: 16px;
   padding: 0 !important;
-  background: #eee;
+  background: #DFFFE6;
+  color: #005011;
+  font-size: 20px;
 }
 .teadown-container {
   background: #fff;
+  padding: 0 !important;
 }
 .teadown-previewer {
   width: 100%;
@@ -29,6 +39,11 @@ body {
   padding: 20px;
   background: #fff;
   overflow: auto;
+}
+.teadown-splitter {
+  display: inline-block;
+  color: #B7B7B7;
+  padding: 0 4px;
 }
 .teadown-fullwin {
   width: 100%;
@@ -50,7 +65,6 @@ body {
 }
 .teadown-editor {
   height: 100%;
-  font-family: "Droid Sans Mono", monospace, "兰亭黑-简 纤黑", "微软雅黑", "Microsoft YaHei" !important;
 }
 .toolbar .icon:hover {
   color: #009900;
@@ -67,4 +81,53 @@ body {
 .CodeMirror pre {
   padding-left: 7px;
   line-height: 1.25;
+  font-family: "Droid Sans Mono", monospace, "兰亭黑-简 纤黑", "微软雅黑", "Microsoft YaHei" !important;
+}
+.CodeMirror .cm-header {
+  font-weight: bold;
+}
+.CodeMirror .cm-header.cm-header-1 {
+  font-size: 28px;
+}
+.CodeMirror .cm-header.cm-header-2 {
+  font-size: 24px;
+}
+.CodeMirror .cm-header.cm-header-3 {
+  font-size: 20px;
+}
+.CodeMirror .cm-header.cm-header-4 {
+  font-size: 18px;
+}
+.CodeMirror .cm-header.cm-header-5 {
+  font-size: 16px;
+}
+.CodeMirror .cm-header.cm-header-6 {
+  font-size: 14px;
+}
+i.teadown.icon {
+  font-family: 'teadown-icon' !important;
+}
+i.icon.teadown.wrap:before {
+  content: "\e940";
+}
+i.icon.teadown.tea:before {
+  content: "\e603";
+}
+i.icon.teadown.default:before {
+  content: "\e775";
+}
+i.icon.teadown.sublime:before {
+  content: "\e604";
+}
+i.icon.teadown.emacs:before {
+  content: "\e602";
+}
+i.icon.teadown.vim:before {
+  content: "\e614";
+}
+i.icon.teadown.light:before {
+  content: "\e74e";
+}
+i.icon.teadown.dark:before {
+  content: "\e64e";
 }

@@ -11,16 +11,13 @@ const uuidv4 = require('uuid/v4');
 
 let win;
 const dirTree = require('directory-tree');
-// let tempString;
 let currentDocPath, currentHtmlPath, docRoot;
 let appConfig = {
   docRoot: path.join(__dirname, 'demo-md'),
-  saveInteval: 5
+  saveInteval: 4
 };
-// let myCachePath = "/tmp/teadown-cache";
 
 function createWindow() {
-
   win = new BrowserWindow({
     width: 1024,
     height: 768,
@@ -37,7 +34,8 @@ function createWindow() {
 
   win.on('closed', () => {
     win = null
-  })
+  });
+  
 }
 
 
@@ -100,19 +98,6 @@ md.use(require("markdown-it-table-of-contents"), {
   //markerPattern: "/^\[toc\]$/im"
 });
 
-
-
-// if (!fs.existsSync(myCachePath)) {
-//   fs.mkdirSync(myCachePath, 0766);
-//   fs.symlink(
-//     path.join(__dirname, 'web', 'assets'),
-//     path.join(myCachePath, 'assets'),
-//     () => {
-//       console.log("symlink created");
-//     }
-//   );
-// }
-
 const loadFileTree = (event)=>{
   docRoot = appConfig.docRoot;
   
@@ -122,10 +107,9 @@ const loadFileTree = (event)=>{
   event.sender.send('threadReaded', tree);
 }
 
-// fs.readFile(path.join(__dirname, 'web', 'preview.html'), (err, data) => {
-//   if (err) throw err;
-//   tempString = data.toString();
-// });
+ipcMain.on('reqSettings', (event)=>{
+  event.sender.send("resSettings", appConfig);
+});
 
 ipcMain.on("onSettingChanged", (event, arg) => {
   appConfig = arg;

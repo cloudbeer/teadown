@@ -2,11 +2,11 @@ const webpack = require('webpack');
 const vendors = [
   'react',
   'react-dom',
-  'react-ace',
   'mermaid',
   'echarts',
   'semantic-ui-react',
-  'electron'
+  'electron',
+  'codemirror'
 ];
 
 module.exports = {
