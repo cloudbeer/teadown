@@ -1,4 +1,5 @@
-# teadown is a Markdown Editor and Previewer
+# teadown is a Markdown Editor and Previewer (not finish..)
+
 ## For writers
 
 Download, install and run it.
@@ -35,7 +36,7 @@ features:
 
 ## Editor
 
-- ACE editor
+- codemirror editor
 
 
 

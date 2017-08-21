@@ -50,7 +50,8 @@ class TeadownLayout extends React.Component {
                 autoSaveInteval: 2,
             },
             height: "",
-            docs: {},
+            treeFiles: {},
+            plainFiles: [],
             showStyle: 5,
             source: "",
             htmlData: `<div style="padding:20px;font-size:20px">
@@ -65,23 +66,29 @@ class TeadownLayout extends React.Component {
         this.srcTypeStoped = true; //when you stop type, code will save.
         this.getColWidth.bind(this);
         this.onSettingChanged.bind(this);
+
         this.autoSave.bind(this)();
+
         this.currentCursor = null;
 
-        this.timerTypeCheck = null; //record preview timeout timer
+        this.currentFolder = null;
+        this.currentFile = null;
+        this.timerTypeCheck = null; //record previous timeout timer
 
         ipcRenderer.send("reqSettings");
         ipcRenderer.on('resSettings', (evt, arg) => {
             this.setState({ settings: arg });
         });
 
-        ipcRenderer.send('threadReading', '');
-        ipcRenderer.on("threadReaded", (evt, arg) => {
-            arg.toggled = true;
-            this.setState({ docs: arg });
+        ipcRenderer.send('reqFiles');
+        ipcRenderer.on("resFiles", (evt, arg) => {
+            arg.treeFiles.toggled = true;
+            this.currentCursor = arg.treeFiles;
+            arg.treeFiles.active = true;
+            this.setState(arg);
         });
 
-        ipcRenderer.on("previewRefreshed", (evt, arg) => {
+        ipcRenderer.on("resDocRead", (evt, arg) => {
             let upState = {};
             if (arg.source) {
                 upState.source = arg.source;
@@ -149,8 +156,6 @@ class TeadownLayout extends React.Component {
     componentDidMount() {
         this.updateDimensions();
         window.addEventListener("resize", this.updateDimensions.bind(this));
-
-
         mermaid.initialize({
             startOnLoad: true
         });
@@ -190,6 +195,19 @@ class TeadownLayout extends React.Component {
         this.srcChanged = true;
         this.srcTypeStoped = false;
     }
+    onAddMdClick() {
+        console.log(this.currentCursor);
+        // let targetFolderNode = this.currentCursor;
+        if (this.currentCursor.type === 'file') {
+            return;
+        }
+        this.currentCursor.children.push({
+            name: <input onBlur={this.onNewFileSave.bind(this)} />,
+            // type: 'file',
+            // extension: '.md'
+        });
+        this.setState({ treeFiles: this.state.treeFiles });
+    }
     onSettingChanged(k, v) {
         let settings = this.state.settings;
         settings[k] = v;
@@ -198,7 +216,6 @@ class TeadownLayout extends React.Component {
         }
         this.setState({ settings: settings });
     }
-
     onSettingsSave() {
         ipcRenderer.send("onSettingChanged", this.state.settings);
         this.setState({ settingsOpen: false });
@@ -206,7 +223,6 @@ class TeadownLayout extends React.Component {
     onSettingsClose() {
         this.setState({ settingsOpen: false });
     }
-
     onBrowseFolderClick() {
         ipcRenderer.send("onBrowseFolderClick", "");
     }
@@ -214,16 +230,21 @@ class TeadownLayout extends React.Component {
         if (this.state.cursor) { this.state.cursor.active = false; }
         node.active = true;
         if (node.children) { node.toggled = toggled; }
+        this.currentCursor = node;
         if (node.type === "directory") {
             this.setState({ cursor: node });
+            this.currentFolder = node;
             return;
         }
         if (node.type === "file" && node.extension === ".md") {
-            this.currentCursor = node;
-            ipcRenderer.send('docReading', node.path);
+            // this.currentCursor = node;
+            ipcRenderer.send('reqDocRead', node.path);
         }
     }
-
+    onNewFileSave(evt) {
+        let fileName = evt.target.value;
+        //if (fileName)
+    }
     render() {
         const highlight = "olive", normalCl = "black";
         const listIconColor = (this.state.showStyle & 1) === 1 ? highlight : normalCl;
@@ -251,9 +272,16 @@ class TeadownLayout extends React.Component {
                 </Grid.Column>
                 <Grid.Column textAlign="right" width={8} className="toolbar">
                     <Popup content="New file" basic
-                        trigger={<Icon name="add" />} />
+                        trigger={<Icon name="file outline" onClick={this.onAddMdClick.bind(this)} />} />
                     <Popup content="Delete file" basic
-                        trigger={<Icon name="delete" />} />
+                        trigger={<Icon name="trash" />} />
+
+                    {
+                        (this.currentCursor && this.currentCursor.type === 'file' && this.currentCursor.extension === '.md') ?
+                            <Popup content="Export PDF" basic
+                                trigger={<Icon name="file pdf outline" />} /> : null
+                    }
+                    <span className="teadown-splitter">|</span>
                     <Popup content="Switch editor line wrapping" basic
                         trigger={<Icon name="teadown wrap" color={this.state.lineWrapping ? "olive" : "black"} onClick={this.toggleLineWrap.bind(this)} />} />
                     <span className="teadown-splitter">|</span>
@@ -267,8 +295,6 @@ class TeadownLayout extends React.Component {
                     <Popup content="Switch preview on/off" basic
                         trigger={<Icon name="chrome" loading={browserIconColor === highlight} color={browserIconColor} onClick={this.togglePreviewer.bind(this)} />} />
                     <span className="teadown-splitter">|</span>
-                    <Popup content="Export PDF" basic
-                        trigger={<Icon name="file pdf outline" />} />
                     <Popup content="Settings" basic
                         trigger={<Icon name="settings"
                             onClick={() => { this.setState({ settingsOpen: true }) }} />} />
@@ -289,7 +315,7 @@ class TeadownLayout extends React.Component {
                         }}>
                         <Treebeard
                             style={theme}
-                            data={this.state.docs}
+                            data={this.state.treeFiles}
                             onToggle={this.onDocToggle.bind(this)}
                         />
                     </Grid.Column> : null

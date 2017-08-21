@@ -10,7 +10,7 @@ const fs = require("fs");
 const uuidv4 = require('uuid/v4');
 
 let win;
-const dirTree = require('directory-tree');
+const dirTree = require('./teadown-tree');
 let currentDocPath, currentHtmlPath, docRoot;
 let appConfig = {
   docRoot: path.join(__dirname, 'demo-md'),
@@ -35,7 +35,7 @@ function createWindow() {
   win.on('closed', () => {
     win = null
   });
-  
+
 }
 
 
@@ -98,16 +98,18 @@ md.use(require("markdown-it-table-of-contents"), {
   //markerPattern: "/^\[toc\]$/im"
 });
 
-const loadFileTree = (event)=>{
+const loadFileTree = (event) => {
   docRoot = appConfig.docRoot;
-  
-  const tree = dirTree(docRoot, {
+
+  const plainFiles = [];
+  const treeFiles = dirTree(docRoot, {
     extensions: /\.md$/
-  });
-  event.sender.send('threadReaded', tree);
+  }, plainFiles);
+
+  event.sender.send('resFiles', { treeFiles, plainFiles });
 }
 
-ipcMain.on('reqSettings', (event)=>{
+ipcMain.on('reqSettings', (event) => {
   event.sender.send("resSettings", appConfig);
 });
 
@@ -118,14 +120,14 @@ ipcMain.on("onSettingChanged", (event, arg) => {
 });
 
 
-ipcMain.on('threadReading', (event, arg) => {
+ipcMain.on('reqFiles', (event, arg) => {
   loadFileTree(event);
   event.sender.send('onFolderChosen', docRoot);
 });
 
 ipcMain.on("docReadToEdit", (event, arg) => {
   //const previewFile = path.join(myCachePath, currentHtmlPath + ".html");
-  //event.sender.send("previewRefreshed", previewFile);
+  //event.sender.send("resDocRead", previewFile);
   fs.readFile(currentDocPath, (err, data) => {
     const oriData = data.toString();
     event.sender.send('docEditReaded', oriData);
@@ -136,7 +138,7 @@ ipcMain.on("docSaving", (event, arg) => {
   if (!currentDocPath) {
     console.error("currentDocPath 没有值，要弹出窗口新建");
   }
-  event.sender.send("previewRefreshed", {
+  event.sender.send("resDocRead", {
     oriData: arg,
     htmlData: md.render(arg)
   });
@@ -158,7 +160,7 @@ ipcMain.on("onBrowseFolderClick", (event, arg) => {
 });
 
 
-ipcMain.on('docReading', (event, arg) => {
+ipcMain.on('reqDocRead', (event, arg) => {
   currentDocPath = arg;
   // currentHtmlPath = Buffer.from(arg).toString('base64');
   // currentHtmlPath = currentHtmlPath.replace(/\//ig, "-");
@@ -167,22 +169,10 @@ ipcMain.on('docReading', (event, arg) => {
     const oriData = data.toString();
     const htmlData = md.render(oriData);
 
-    event.sender.send("previewRefreshed", {
+    event.sender.send("resDocRead", {
       //url: previewFile,
       source: oriData,
       htmlData: htmlData
     });
-
-    // htmlData = tempString.replace(/{{content}}/ig, htmlData)
-    // const previewFile = path.join(myCachePath, currentHtmlPath + ".html");
-    // fs.writeFile(previewFile, htmlData, {
-    //   flag: 'w'
-    // }, (err) => {
-    //   if (err) throw err;
-    //   event.sender.send("previewRefreshed", {
-    //     url: previewFile,
-    //     source: oriData
-    //   });
-    // });
   });
 });

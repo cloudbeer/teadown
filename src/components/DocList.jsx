@@ -18,7 +18,7 @@ export class DocList extends React.Component {
 
   viewDocHandler(path) {
     this.setState({ path: path });
-    ipcRenderer.send('docReading', path);
+    ipcRenderer.send('reqDocRead', path);
   }
   componentWillReceiveProps(nextProps) {
     this.setState(nextProps);
