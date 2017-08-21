@@ -24,7 +24,10 @@ let fileIndex = 0;
 
 function directoryTree(path, options, plainContainer, parentId) {
   const name = PATH.basename(path);
-  const item = { path, name };
+  const item = {
+    path,
+    name
+  };
 
   item.id = fileIndex;
   item.parent = parentId || 0;
@@ -32,8 +35,11 @@ function directoryTree(path, options, plainContainer, parentId) {
 
   let stats;
 
-  try { stats = FS.statSync(path); }
-  catch (e) { return null; }
+  try {
+    stats = FS.statSync(path);
+  } catch (e) {
+    return null;
+  }
 
   // Skip if it matches the exclude regex
   if (options && options.exclude && options.exclude.test(path))
@@ -42,7 +48,9 @@ function directoryTree(path, options, plainContainer, parentId) {
   // if (onEachPath) {
   //   onEachPath(item, PATH);
   // }
-  plainContainer.push(item);
+  if (plainContainer) {
+    plainContainer.push(item);
+  }
 
   if (stats.isFile()) {
 
@@ -52,13 +60,12 @@ function directoryTree(path, options, plainContainer, parentId) {
     if (options && options.extensions && !options.extensions.test(ext))
       return null;
 
-    item.size = stats.size;  // File size in bytes
+    item.size = stats.size; // File size in bytes
     item.extension = ext;
     item.type = constants.FILE;
 
 
-  }
-  else if (stats.isDirectory()) {
+  } else if (stats.isDirectory()) {
     let dirData = safeReadDirSync(path);
     if (dirData === null) return null;
     item.children = dirData
@@ -74,4 +81,20 @@ function directoryTree(path, options, plainContainer, parentId) {
 
   return item;
 }
-module.exports = directoryTree;
+
+
+function findNode(treeNode, id) {
+  if (treeNode.id === id) {
+    return treeNode;
+  } else {
+    for (const subTreeNode of treeNode.children) {
+      return findNode(subTreeNode, id);
+    }
+  }
+}
+function getMaxId() {
+  return fileIndex;
+}
+module.exports.getMaxId = getMaxId;
+module.exports.directoryTree = directoryTree;
+module.exports.findNode = findNode;

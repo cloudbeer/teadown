@@ -33,7 +33,7 @@ theme.tree.node.header.title.paddingLeft = "1.5em";
 theme.tree.node.toggle.base.position = "absolute";
 theme.tree.node.toggle.base.top = "0.4em";
 
-
+import { findNode } from "../teadown-tree";
 
 import { ipcRenderer } from "electron";
 
@@ -62,6 +62,7 @@ class TeadownLayout extends React.Component {
             lineWrapping: false
         };
 
+        this.maxId = 0;
         this.srcChanged = false;
         this.srcTypeStoped = true; //when you stop type, code will save.
         this.getColWidth.bind(this);
@@ -85,6 +86,7 @@ class TeadownLayout extends React.Component {
             arg.treeFiles.toggled = true;
             this.currentCursor = arg.treeFiles;
             arg.treeFiles.active = true;
+            this.maxId = arg.maxId;
             this.setState(arg);
         });
 
@@ -196,14 +198,20 @@ class TeadownLayout extends React.Component {
         this.srcTypeStoped = false;
     }
     onAddMdClick() {
-        console.log(this.currentCursor);
+        //console.log(this.currentCursor);
         // let targetFolderNode = this.currentCursor;
+        let targetDir;
         if (this.currentCursor.type === 'file') {
-            return;
+            targetDir = findNode(this.state.treeFiles, this.currentCursor.parent);
+        } else {
+            targetDir = this.currentCursor;
         }
-        this.currentCursor.children.push({
+        console.log(targetDir);
+        targetDir.children.push({
             name: <input onBlur={this.onNewFileSave.bind(this)} />,
-            // type: 'file',
+            parent: targetDir.id,
+            id: ++this.maxId,
+            type: 'file',
             // extension: '.md'
         });
         this.setState({ treeFiles: this.state.treeFiles });

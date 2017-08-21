@@ -10,7 +10,7 @@ const fs = require("fs");
 const uuidv4 = require('uuid/v4');
 
 let win;
-const dirTree = require('./teadown-tree');
+const util = require('./teadown-tree');
 let currentDocPath, currentHtmlPath, docRoot;
 let appConfig = {
   docRoot: path.join(__dirname, 'demo-md'),
@@ -101,12 +101,17 @@ md.use(require("markdown-it-table-of-contents"), {
 const loadFileTree = (event) => {
   docRoot = appConfig.docRoot;
 
-  const plainFiles = [];
-  const treeFiles = dirTree(docRoot, {
+  // const plainFiles = [];
+  const treeFiles = util.directoryTree(docRoot, {
     extensions: /\.md$/
-  }, plainFiles);
+  });
 
-  event.sender.send('resFiles', { treeFiles, plainFiles });
+  const maxId = util.getMaxId();
+
+  event.sender.send('resFiles', {
+    treeFiles,
+    maxId
+  });
 }
 
 ipcMain.on('reqSettings', (event) => {
