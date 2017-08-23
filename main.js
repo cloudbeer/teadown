@@ -35,7 +35,6 @@ function createWindow() {
   win.on('closed', () => {
     win = null
   });
-
 }
 
 
@@ -127,7 +126,7 @@ ipcMain.on("onSettingChanged", (event, arg) => {
 
 ipcMain.on('reqFiles', (event, arg) => {
   loadFileTree(event);
-  event.sender.send('onFolderChosen', docRoot);
+  event.sender.send('resFolderChoose', docRoot);
 });
 
 ipcMain.on("docReadToEdit", (event, arg) => {
@@ -139,7 +138,7 @@ ipcMain.on("docReadToEdit", (event, arg) => {
   });
 });
 
-ipcMain.on("docSaving", (event, arg) => {
+ipcMain.on("reqDocSave", (event, arg) => {
   if (!currentDocPath) {
     console.error("currentDocPath 没有值，要弹出窗口新建");
   }
@@ -154,12 +153,12 @@ ipcMain.on("docSaving", (event, arg) => {
   });
 });
 
-ipcMain.on("onBrowseFolderClick", (event, arg) => {
+ipcMain.on("reqFolderChoose", (event, arg) => {
   dialog.showOpenDialog(win, {
     properties: ['openDirectory']
   }, (paths) => {
     if (paths && paths.length > 0) {
-      event.sender.send("onFolderChosen", paths[0]);
+      event.sender.send("resFolderChoose", paths[0]);
     }
   });
 });

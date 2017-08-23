@@ -101,7 +101,7 @@ class TeadownLayout extends React.Component {
             upState.cursor = this.currentCursor;
             this.setState(upState);
         });
-        ipcRenderer.on("onFolderChosen", (evt, arg) => {
+        ipcRenderer.on("resFolderChoose", (evt, arg) => {
             let settings = this.state.settings;
             settings.docRoot = arg;
             this.setState({ settings: settings });
@@ -113,7 +113,7 @@ class TeadownLayout extends React.Component {
         const timerSaveCheck = setInterval(() => {
             if (this.srcChanged && this.srcTypeStoped) {
                 this.srcChanged = false;
-                ipcRenderer.send("docSaving", this.state.source);
+                ipcRenderer.send("reqDocSave", this.state.source);
             }
         }, 300);
     }
@@ -232,7 +232,7 @@ class TeadownLayout extends React.Component {
         this.setState({ settingsOpen: false });
     }
     onBrowseFolderClick() {
-        ipcRenderer.send("onBrowseFolderClick", "");
+        ipcRenderer.send("reqFolderChoose");
     }
     onDocToggle(node, toggled) {
         if (this.state.cursor) { this.state.cursor.active = false; }
@@ -272,6 +272,15 @@ class TeadownLayout extends React.Component {
             { key: 'vim', value: 'vim', text: 'vim', icon: 'teadown vim' },
             { key: 'emacs', value: 'emacs', text: 'emacs', icon: 'teadown emacs' }
         ];
+        let createdFolder = this.state.settings.docRoot;
+        if (this.state.cursor) {
+            if (this.state.cursor.type === "file") {
+                createdFolder = this.state.cursor.path;
+                createdFolder = createdFolder.substr(0, createdFolder.lastIndexOf("/"));
+            } else {
+                createdFolder = this.state.cursor.path;
+            }
+        };
         return <Grid>
             <Grid.Row className="teadown-header">
                 <Grid.Column width={8} >
@@ -279,11 +288,17 @@ class TeadownLayout extends React.Component {
                     <span> teadown</span>
                 </Grid.Column>
                 <Grid.Column textAlign="right" width={8} className="toolbar">
-                    <Popup content="New file" basic
-                        trigger={<Icon name="file outline" onClick={this.onAddMdClick.bind(this)} />} />
+                    <Popup basic flowing hoverable
+                        trigger={<Icon name="file outline" />}>
+                        <Header as="h4">Create new markdown file</Header>
+                        <div>@{createdFolder}/</div>
+                        <Form>
+                            <Form.Input placeholder='File name' />
+                            <Form.Button onClick={this.onAddMdClick.bind(this)}>Create</Form.Button>
+                        </Form>
+                    </Popup>
                     <Popup content="Delete file" basic
                         trigger={<Icon name="trash" />} />
-
                     {
                         (this.currentCursor && this.currentCursor.type === 'file' && this.currentCursor.extension === '.md') ?
                             <Popup content="Export PDF" basic
@@ -338,11 +353,11 @@ class TeadownLayout extends React.Component {
                         paddingRight: 0
                     }}>
                     <CodeMirror
-                        value={this.state.source}
+                        value={this.state.source||" "}
                         onValueChange={this.onSrcChange.bind(this)}
                         className="teadown-editor"
                         options={{
-                            keyMap: "vim",
+                            keyMap: "default",
                             mode: "markdown",
                             lineNumbers: true,
                             lineWrapping: this.state.lineWrapping,
@@ -364,7 +379,7 @@ class TeadownLayout extends React.Component {
                     }}
                 >
                     <div className="markdown-body"
-                        dangerouslySetInnerHTML={{ __html: this.state.htmlData }}></div>
+                        dangerouslySetInnerHTML={{ __html: this.state.htmlData || " " }}></div>
                 </Grid.Column> : null
                 }
             </Grid.Row>
