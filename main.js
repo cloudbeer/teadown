@@ -105,11 +105,11 @@ const loadFileTree = (event) => {
     extensions: /\.md$/
   });
 
-  const maxId = util.getMaxId();
+  // const maxId = util.getMaxId();
 
   event.sender.send('resFiles', {
     treeFiles,
-    maxId
+    // maxId
   });
 }
 
@@ -163,6 +163,58 @@ ipcMain.on("reqFolderChoose", (event, arg) => {
   });
 });
 
+ipcMain.on("reqCreateFile", (evt, arg) => {
+  let newFileName = arg.rootName;
+  const mdName = arg.mdName;
+  if (!mdName.toLowerCase().endsWith(".md")) {
+    arg.mdName = arg.mdName + ".md";
+  }
+  if (arg.fdName) {
+    newFileName = path.join(newFileName, arg.fdName);
+    if (!fs.existsSync(newFileName)) {
+      fs.mkdirSync(newFileName);
+    }
+  }
+  if (arg.mdName) {
+    newFileName = path.join(newFileName, arg.mdName);
+    fs.writeFileSync(newFileName, "# " + mdName);
+    loadFileTree(evt);
+    const bFileName = Buffer.from(newFileName).toString('base64');
+    //console.log(bFileName);
+    evt.sender.send("currentBName", bFileName); //TODO: send currentName to selected.
+  }
+});
+
+function rimraf(dir_path) {
+  if (fs.existsSync(dir_path)) {
+    fs.readdirSync(dir_path).forEach(function (entry) {
+      var entry_path = path.join(dir_path, entry);
+      if (fs.lstatSync(entry_path).isDirectory()) {
+        rimraf(entry_path);
+      } else {
+        fs.unlinkSync(entry_path);
+      }
+    });
+    fs.rmdirSync(dir_path);
+  }
+}
+
+ipcMain.on("reqDeleteFile", (evt, arg) => {
+  dialog.showMessageBox(win, {
+    type: "info",
+    buttons: ["OK", "Cancel"],
+    message: "Are you sure to delete " + arg.dPath + "?"
+  }, (res) => {
+    if (res === 0) {
+      if (arg.dType === "file") {
+        fs.unlinkSync(arg.dPath);
+      } else {
+        rimraf(arg.dPath);
+      }
+      loadFileTree(evt);
+    }
+  });
+});
 
 ipcMain.on('reqDocRead', (event, arg) => {
   currentDocPath = arg;

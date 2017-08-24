@@ -20,7 +20,7 @@ function safeReadDirSync(path) {
   return dirData;
 }
 
-let fileIndex = 0;
+// let fileIndex = 0;
 
 function directoryTree(path, options, plainContainer, parentId) {
   const name = PATH.basename(path);
@@ -29,9 +29,12 @@ function directoryTree(path, options, plainContainer, parentId) {
     name
   };
 
-  item.id = fileIndex;
-  item.parent = parentId || 0;
-  fileIndex++;
+  // item.id = fileIndex;
+  // item.parent = parentId || 0;
+  item.id = Buffer(path).toString("base64");
+  item.parent = parentId;
+
+  // fileIndex++;
 
   let stats;
 
@@ -92,9 +95,9 @@ function findNode(treeNode, id) {
     }
   }
 }
-function getMaxId() {
-  return fileIndex;
-}
-module.exports.getMaxId = getMaxId;
+// function getMaxId() {
+//   return fileIndex;
+// }
+// module.exports.getMaxId = getMaxId;
 module.exports.directoryTree = directoryTree;
 module.exports.findNode = findNode;

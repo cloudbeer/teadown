@@ -59,14 +59,17 @@ class TeadownLayout extends React.Component {
             </div>`,
             settingsOpen: false,
             cursor: null,
-            lineWrapping: false
+            lineWrapping: false,
+            newFileName: "",
+            newFolderName: ""
         };
 
-        this.maxId = 0;
+        // this.maxId = 0;
         this.srcChanged = false;
         this.srcTypeStoped = true; //when you stop type, code will save.
         this.getColWidth.bind(this);
         this.onSettingChanged.bind(this);
+        this.onInputValueChanged.bind(this);
 
         this.autoSave.bind(this)();
 
@@ -86,7 +89,8 @@ class TeadownLayout extends React.Component {
             arg.treeFiles.toggled = true;
             this.currentCursor = arg.treeFiles;
             arg.treeFiles.active = true;
-            this.maxId = arg.maxId;
+            console.log(arg);
+            // this.maxId = arg.maxId;
             this.setState(arg);
         });
 
@@ -123,15 +127,15 @@ class TeadownLayout extends React.Component {
             case 0:
                 return [0, 0, 0];
             case 1:
-                return [4, 0, 0];
+                return [16, 0, 0];
             case 2:
                 return [0, 16, 0];
             case 3:
-                return [4, 12, 0];
+                return [6, 10, 0];
             case 4:
                 return [0, 0, 16];
             case 5:
-                return [4, 0, 12];
+                return [6, 0, 10];
             case 6:
                 return [0, 9, 7];
             case 7:
@@ -197,24 +201,30 @@ class TeadownLayout extends React.Component {
         this.srcChanged = true;
         this.srcTypeStoped = false;
     }
-    onAddMdClick() {
-        //console.log(this.currentCursor);
-        // let targetFolderNode = this.currentCursor;
+    onAddMdClick(evt) {
+        let fdName = this.state.newFolderName;
+        let mdName = this.state.newFileName;
+        let targetFolderNode = this.currentCursor;
         let targetDir;
         if (this.currentCursor.type === 'file') {
             targetDir = findNode(this.state.treeFiles, this.currentCursor.parent);
         } else {
             targetDir = this.currentCursor;
         }
-        console.log(targetDir);
-        targetDir.children.push({
-            name: <input onBlur={this.onNewFileSave.bind(this)} />,
-            parent: targetDir.id,
-            id: ++this.maxId,
-            type: 'file',
-            // extension: '.md'
+        const rootName = targetDir.path;
+        ipcRenderer.send("reqCreateFile", {
+            mdName, fdName, rootName
         });
-        this.setState({ treeFiles: this.state.treeFiles });
+        //console.log(mdName, fdName, targetDir);
+        // console.log(targetDir);
+        // targetDir.children.push({
+        //     name: <input onBlur={this.onNewFileSave.bind(this)} />,
+        //     parent: targetDir.id,
+        //     id: ++this.maxId,
+        //     type: 'file',
+        //     // extension: '.md'
+        // });
+        // this.setState({ treeFiles: this.state.treeFiles });
     }
     onSettingChanged(k, v) {
         let settings = this.state.settings;
@@ -223,6 +233,11 @@ class TeadownLayout extends React.Component {
             v = parseInt(v) || 4;
         }
         this.setState({ settings: settings });
+    }
+    onInputValueChanged(key, val) {
+        const obj = {};
+        obj[key] = val;
+        this.setState(obj);
     }
     onSettingsSave() {
         ipcRenderer.send("onSettingChanged", this.state.settings);
@@ -249,9 +264,10 @@ class TeadownLayout extends React.Component {
             ipcRenderer.send('reqDocRead', node.path);
         }
     }
-    onNewFileSave(evt) {
-        let fileName = evt.target.value;
-        //if (fileName)
+    onDeleteFile() {
+        const dPath = this.currentCursor.path;
+        const dType = this.currentCursor.type;
+        ipcRenderer.send("reqDeleteFile", { dPath, dType });
     }
     render() {
         const highlight = "olive", normalCl = "black";
@@ -290,15 +306,21 @@ class TeadownLayout extends React.Component {
                 <Grid.Column textAlign="right" width={8} className="toolbar">
                     <Popup basic flowing hoverable
                         trigger={<Icon name="file outline" />}>
-                        <Header as="h4">Create new markdown file</Header>
+                        <Header as="h4">Create new file</Header>
                         <div>@{createdFolder}/</div>
                         <Form>
-                            <Form.Input placeholder='File name' />
+                            <Form.Input placeholder='New folder name, you can leave empty.'
+                                onChange={(evt, val) => { this.onInputValueChanged("newFolderName", val.value) }} />
+                            <Form.Input placeholder='New file name, leave empty will only create folder.'
+                                onChange={(evt, val) => { this.onInputValueChanged("newFileName", val.value) }} />
                             <Form.Button onClick={this.onAddMdClick.bind(this)}>Create</Form.Button>
                         </Form>
                     </Popup>
-                    <Popup content="Delete file" basic
-                        trigger={<Icon name="trash" />} />
+                    {
+                        (this.currentCursor && this.state.settings.docRoot !== this.currentCursor.path) ?
+                            <Popup content="Delete file/folder" basic
+                                trigger={<Icon name="trash" onClick={this.onDeleteFile.bind(this)} />} /> : null
+                    }
                     {
                         (this.currentCursor && this.currentCursor.type === 'file' && this.currentCursor.extension === '.md') ?
                             <Popup content="Export PDF" basic
@@ -353,7 +375,7 @@ class TeadownLayout extends React.Component {
                         paddingRight: 0
                     }}>
                     <CodeMirror
-                        value={this.state.source||" "}
+                        value={this.state.source || " "}
                         onValueChange={this.onSrcChange.bind(this)}
                         className="teadown-editor"
                         options={{
