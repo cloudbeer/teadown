@@ -97,21 +97,6 @@ md.use(require("markdown-it-table-of-contents"), {
   //markerPattern: "/^\[toc\]$/im"
 });
 
-const loadFileTree = (event) => {
-  docRoot = appConfig.docRoot;
-
-  // const plainFiles = [];
-  const treeFiles = util.directoryTree(docRoot, {
-    extensions: /\.md$/
-  });
-
-  // const maxId = util.getMaxId();
-
-  event.sender.send('resFiles', {
-    treeFiles,
-    // maxId
-  });
-}
 
 ipcMain.on('reqSettings', (event) => {
   event.sender.send("resSettings", appConfig);
@@ -120,13 +105,13 @@ ipcMain.on('reqSettings', (event) => {
 ipcMain.on("onSettingChanged", (event, arg) => {
   appConfig = arg;
   fs.writeFileSync(configPath, JSON.stringify(arg));
-  loadFileTree(event);
+  util.loadFileTree(event, appConfig.docRoot);
 });
 
 
 ipcMain.on('reqFiles', (event, arg) => {
-  loadFileTree(event);
-  event.sender.send('resFolderChoose', docRoot);
+  util.loadFileTree(event, appConfig.docRoot);
+  event.sender.send('resFolderChoose', docRoot); //TODO: What is this
 });
 
 ipcMain.on("docReadToEdit", (event, arg) => {
@@ -178,26 +163,13 @@ ipcMain.on("reqCreateFile", (evt, arg) => {
   if (arg.mdName) {
     newFileName = path.join(newFileName, arg.mdName);
     fs.writeFileSync(newFileName, "# " + mdName);
-    loadFileTree(evt);
-    const bFileName = Buffer.from(newFileName).toString('base64');
-    //console.log(bFileName);
-    evt.sender.send("currentBName", bFileName); //TODO: send currentName to selected.
   }
+  // console.log(evt, newFileName);
+
+  util.loadFileTree(evt, appConfig.docRoot, newFileName);
+  //evt.sender.send("resCurrentPath", newFileName);
 });
 
-function rimraf(dir_path) {
-  if (fs.existsSync(dir_path)) {
-    fs.readdirSync(dir_path).forEach(function (entry) {
-      var entry_path = path.join(dir_path, entry);
-      if (fs.lstatSync(entry_path).isDirectory()) {
-        rimraf(entry_path);
-      } else {
-        fs.unlinkSync(entry_path);
-      }
-    });
-    fs.rmdirSync(dir_path);
-  }
-}
 
 ipcMain.on("reqDeleteFile", (evt, arg) => {
   dialog.showMessageBox(win, {
@@ -206,12 +178,12 @@ ipcMain.on("reqDeleteFile", (evt, arg) => {
     message: "Are you sure to delete " + arg.dPath + "?"
   }, (res) => {
     if (res === 0) {
-      if (arg.dType === "file") {
+      if (arg.dPath.endsWith(".md")) {
         fs.unlinkSync(arg.dPath);
       } else {
-        rimraf(arg.dPath);
+        util.rimraf(arg.dPath);
       }
-      loadFileTree(evt);
+      util.loadFileTree(evt, appConfig.docRoot, arg.dPath.substr(0, arg.dPath.lastIndexOf("/")));
     }
   });
 });

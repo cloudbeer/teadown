@@ -1,6 +1,6 @@
 'use strict';
 
-const FS = require('fs');
+const fs = require('fs');
 const PATH = require('path');
 const constants = {
   DIRECTORY: 'directory',
@@ -10,7 +10,7 @@ const constants = {
 function safeReadDirSync(path) {
   let dirData = {};
   try {
-    dirData = FS.readdirSync(path);
+    dirData = fs.readdirSync(path);
   } catch (ex) {
     if (ex.code == "EACCES")
       //User does not have permissions, ignore directory
@@ -39,7 +39,7 @@ function directoryTree(path, options, plainContainer, parentId) {
   let stats;
 
   try {
-    stats = FS.statSync(path);
+    stats = fs.statSync(path);
   } catch (e) {
     return null;
   }
@@ -86,18 +86,65 @@ function directoryTree(path, options, plainContainer, parentId) {
 }
 
 
-function findNode(treeNode, id) {
-  if (treeNode.id === id) {
+function findNode(treeNode, path) {
+  if (treeNode.path === path) {
     return treeNode;
   } else {
-    for (const subTreeNode of treeNode.children) {
-      return findNode(subTreeNode, id);
+    if (treeNode.children) {
+      for (const subTreeNode of treeNode.children) {
+        return findNode(subTreeNode, path);
+      }
     }
   }
+  return null;
 }
-// function getMaxId() {
-//   return fileIndex;
-// }
-// module.exports.getMaxId = getMaxId;
+
+function setToggleOn(treeNode, path) {
+  if (!path) return;
+  if (treeNode.type === "directory") {
+    if (path.startsWith(treeNode.path + "/")) {
+      treeNode.toggled = true;
+      for (const subTreeNode of treeNode.children) {
+        setToggleOn(subTreeNode, path);
+      }
+    }
+  }
+  if (treeNode.path == path) {
+    treeNode.active = true;
+    treeNode.toggled = (treeNode.type === "directory");
+  }
+}
+
+function rimraf(dir_path) {
+  if (fs.existsSync(dir_path)) {
+    fs.readdirSync(dir_path).forEach(function (entry) {
+      var entry_path = PATH.join(dir_path, entry);
+      if (fs.lstatSync(entry_path).isDirectory()) {
+        rimraf(entry_path);
+      } else {
+        fs.unlinkSync(entry_path);
+      }
+    });
+    fs.rmdirSync(dir_path);
+  }
+}
+
+function loadFileTree(event, docRoot, currentPath) {
+  // docRoot = appConfig.docRoot;
+  const treeFiles = directoryTree(docRoot, {
+    extensions: /\.md$/
+  });
+  if (currentPath) {
+    setToggleOn(treeFiles, currentPath);
+  }
+  event.sender.send('resFiles', {
+    treeFiles,
+    currentPath
+  });
+}
+
 module.exports.directoryTree = directoryTree;
 module.exports.findNode = findNode;
+module.exports.setToggleOn = setToggleOn;
+module.exports.rimraf = rimraf;
+module.exports.loadFileTree = loadFileTree;

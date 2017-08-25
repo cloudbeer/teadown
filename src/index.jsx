@@ -61,7 +61,8 @@ class TeadownLayout extends React.Component {
             cursor: null,
             lineWrapping: false,
             newFileName: "",
-            newFolderName: ""
+            newFolderName: "",
+            currentPath: ""
         };
 
         // this.maxId = 0;
@@ -73,9 +74,9 @@ class TeadownLayout extends React.Component {
 
         this.autoSave.bind(this)();
 
-        this.currentCursor = null;
+        // this.currentCursor = null;
 
-        this.currentFolder = null;
+        // this.currentFolder = null;
         this.currentFile = null;
         this.timerTypeCheck = null; //record previous timeout timer
 
@@ -87,10 +88,13 @@ class TeadownLayout extends React.Component {
         ipcRenderer.send('reqFiles');
         ipcRenderer.on("resFiles", (evt, arg) => {
             arg.treeFiles.toggled = true;
-            this.currentCursor = arg.treeFiles;
-            arg.treeFiles.active = true;
-            console.log(arg);
-            // this.maxId = arg.maxId;
+            if (this.state.cursor) { this.state.cursor.active = false; }
+            if (arg.currentPath) {
+                arg.cursor = findNode(arg.treeFiles, arg.currentPath);
+                if (arg.currentPath.endsWith(".md")) {
+                    ipcRenderer.send('reqDocRead', arg.currentPath);
+                }
+            }
             this.setState(arg);
         });
 
@@ -102,7 +106,7 @@ class TeadownLayout extends React.Component {
             if (arg.htmlData) {
                 upState.htmlData = arg.htmlData;
             }
-            upState.cursor = this.currentCursor;
+            // upState.cursor = this.currentCursor;
             this.setState(upState);
         });
         ipcRenderer.on("resFolderChoose", (evt, arg) => {
@@ -110,6 +114,10 @@ class TeadownLayout extends React.Component {
             settings.docRoot = arg;
             this.setState({ settings: settings });
         });
+        // ipcRenderer.on("resCurrentPath", (evt, arg) => {
+        //     const thisNode = findNode()
+        //     console.log(arg);
+        // });
 
     }
 
@@ -204,27 +212,14 @@ class TeadownLayout extends React.Component {
     onAddMdClick(evt) {
         let fdName = this.state.newFolderName;
         let mdName = this.state.newFileName;
-        let targetFolderNode = this.currentCursor;
-        let targetDir;
-        if (this.currentCursor.type === 'file') {
-            targetDir = findNode(this.state.treeFiles, this.currentCursor.parent);
-        } else {
-            targetDir = this.currentCursor;
+        let rootName = this.state.currentPath;
+        if (rootName.lastIndexOf('.md') > 0) {
+            rootName = rootName.substr(0, rootName.lastIndexOf("/"));
         }
-        const rootName = targetDir.path;
         ipcRenderer.send("reqCreateFile", {
             mdName, fdName, rootName
         });
-        //console.log(mdName, fdName, targetDir);
-        // console.log(targetDir);
-        // targetDir.children.push({
-        //     name: <input onBlur={this.onNewFileSave.bind(this)} />,
-        //     parent: targetDir.id,
-        //     id: ++this.maxId,
-        //     type: 'file',
-        //     // extension: '.md'
-        // });
-        // this.setState({ treeFiles: this.state.treeFiles });
+        this.setState({ newFileName: "", newFolderName: "" })
     }
     onSettingChanged(k, v) {
         let settings = this.state.settings;
@@ -253,21 +248,23 @@ class TeadownLayout extends React.Component {
         if (this.state.cursor) { this.state.cursor.active = false; }
         node.active = true;
         if (node.children) { node.toggled = toggled; }
-        this.currentCursor = node;
-        if (node.type === "directory") {
-            this.setState({ cursor: node });
-            this.currentFolder = node;
-            return;
-        }
+        // this.currentCursor = node;
+        this.setState({ currentPath: node.path, cursor: node });
+        // if (node.type === "directory") {
+        //     this.setState({ cursor: node });
+        //     this.currentFolder = node;
+        //     return;
+        // }
         if (node.type === "file" && node.extension === ".md") {
             // this.currentCursor = node;
             ipcRenderer.send('reqDocRead', node.path);
         }
     }
     onDeleteFile() {
-        const dPath = this.currentCursor.path;
-        const dType = this.currentCursor.type;
-        ipcRenderer.send("reqDeleteFile", { dPath, dType });
+        // const dPath = this.currentCursor.path;
+        // const dType = this.currentCursor.type;
+        const dPath = this.state.currentPath;
+        ipcRenderer.send("reqDeleteFile", { dPath });
     }
     render() {
         const highlight = "olive", normalCl = "black";
@@ -288,15 +285,18 @@ class TeadownLayout extends React.Component {
             { key: 'vim', value: 'vim', text: 'vim', icon: 'teadown vim' },
             { key: 'emacs', value: 'emacs', text: 'emacs', icon: 'teadown emacs' }
         ];
-        let createdFolder = this.state.settings.docRoot;
-        if (this.state.cursor) {
-            if (this.state.cursor.type === "file") {
-                createdFolder = this.state.cursor.path;
-                createdFolder = createdFolder.substr(0, createdFolder.lastIndexOf("/"));
-            } else {
-                createdFolder = this.state.cursor.path;
-            }
-        };
+        let createdFolder = this.state.currentPath || this.state.settings.docRoot;
+        if (createdFolder && createdFolder.lastIndexOf('.md') > 0) {
+            createdFolder = createdFolder.substr(0, createdFolder.lastIndexOf("/"));
+        }
+        // if (this.state.cursor) {
+        //     if (this.state.cursor.type === "file") {
+        //         createdFolder = this.state.cursor.path;
+        //         createdFolder = createdFolder.substr(0, createdFolder.lastIndexOf("/"));
+        //     } else {
+        //         createdFolder = this.state.cursor.path;
+        //     }
+        // };
         return <Grid>
             <Grid.Row className="teadown-header">
                 <Grid.Column width={8} >
@@ -310,19 +310,21 @@ class TeadownLayout extends React.Component {
                         <div>@{createdFolder}/</div>
                         <Form>
                             <Form.Input placeholder='New folder name, you can leave empty.'
+                                value={this.state.newFolderName}
                                 onChange={(evt, val) => { this.onInputValueChanged("newFolderName", val.value) }} />
                             <Form.Input placeholder='New file name, leave empty will only create folder.'
+                                value={this.state.newFileName}
                                 onChange={(evt, val) => { this.onInputValueChanged("newFileName", val.value) }} />
                             <Form.Button onClick={this.onAddMdClick.bind(this)}>Create</Form.Button>
                         </Form>
                     </Popup>
                     {
-                        (this.currentCursor && this.state.settings.docRoot !== this.currentCursor.path) ?
+                        (this.state.settings.docRoot !== this.state.currentPath) ?
                             <Popup content="Delete file/folder" basic
                                 trigger={<Icon name="trash" onClick={this.onDeleteFile.bind(this)} />} /> : null
                     }
                     {
-                        (this.currentCursor && this.currentCursor.type === 'file' && this.currentCursor.extension === '.md') ?
+                        (this.state.currentPath && this.state.currentPath.lastIndexOf(".md") > 0) ?
                             <Popup content="Export PDF" basic
                                 trigger={<Icon name="file pdf outline" />} /> : null
                     }
@@ -333,7 +335,7 @@ class TeadownLayout extends React.Component {
                     <Popup content="Switch Doc list on/off" basic
                         trigger={<Icon name="list" color={listIconColor} onClick={this.toggleList.bind(this)} />} />
                     {
-                        this.currentCursor ?
+                        this.state.currentPath.lastIndexOf(".md") > 0 ?
                             <Popup content="Switch editor on/off" basic
                                 trigger={<Icon name="edit" color={editorIconColor} onClick={this.toggleEditor.bind(this)} />} /> : null
                     }
