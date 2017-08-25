@@ -52,6 +52,10 @@ app.on('activate', () => {
   }
 })
 
+const tmpPath = app.getPath('userData');
+if (!fs.existsSync(tmpPath)) {
+  fs.mkdirSync(tmpPath);
+}
 
 const configPath = path.join(app.getPath('userData'), 'config.json');
 

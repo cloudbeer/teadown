@@ -6,8 +6,10 @@ import 'semantic-ui-css/semantic.min.css';
 
 import "./assets/styles/layout.less";
 
+/** codemirror -------------------*/
 import CodeMirror from 'react-codemirror2'
 require('codemirror/mode/markdown/markdown');
+
 require('codemirror/keymap/vim');
 require('codemirror/keymap/emacs');
 require('codemirror/keymap/sublime');
@@ -18,8 +20,17 @@ require('codemirror/addon/fold/foldcode');
 require('codemirror/addon/fold/markdown-fold');
 require('codemirror/addon/fold/indent-fold');
 require('codemirror/addon/fold/foldgutter');
-import "codemirror/addon/fold/foldgutter.css";
 
+import "codemirror/addon/fold/foldgutter.css";
+import "codemirror/theme/neo.css";
+import "codemirror/theme/night.css";
+import "codemirror/theme/elegant.css";
+import "codemirror/theme/erlang-dark.css";
+import "codemirror/theme/twilight.css";
+import "codemirror/theme/eclipse.css";
+import "codemirror/theme/dracula.css";
+
+/** codemirror ------------ */
 
 
 import { Treebeard, theme } from 'react-treebeard';
@@ -48,6 +59,8 @@ class TeadownLayout extends React.Component {
             settings: {
                 docRoot: "",
                 autoSaveInteval: 2,
+                editorKeymap: "default",
+                editorTheme: "default"
             },
             height: "",
             treeFiles: {},
@@ -76,13 +89,14 @@ class TeadownLayout extends React.Component {
 
         // this.currentCursor = null;
 
-        // this.currentFolder = null;
+        // this.docRoot = null;
         this.currentFile = null;
         this.timerTypeCheck = null; //record previous timeout timer
 
         ipcRenderer.send("reqSettings");
         ipcRenderer.on('resSettings', (evt, arg) => {
-            this.setState({ settings: arg });
+            let settings = Object.assign(this.state.settings, arg);
+            this.setState({ settings });
         });
 
         ipcRenderer.send('reqFiles');
@@ -109,6 +123,7 @@ class TeadownLayout extends React.Component {
             // upState.cursor = this.currentCursor;
             this.setState(upState);
         });
+
         ipcRenderer.on("resFolderChoose", (evt, arg) => {
             let settings = this.state.settings;
             settings.docRoot = arg;
@@ -170,6 +185,7 @@ class TeadownLayout extends React.Component {
     componentDidMount() {
         this.updateDimensions();
         window.addEventListener("resize", this.updateDimensions.bind(this));
+        console.log("I am started here.");
         mermaid.initialize({
             startOnLoad: true
         });
@@ -197,6 +213,9 @@ class TeadownLayout extends React.Component {
     }
     toggleLineWrap() {
         this.setState({ lineWrapping: !this.state.lineWrapping });
+    }
+    toggleLineNumber() {
+        this.setState({ lineNumber: !this.state.lineNumber });
     }
     onSrcChange(editor, metadata, val) {
         if (this.timerTypeCheck) {
@@ -275,9 +294,11 @@ class TeadownLayout extends React.Component {
             { key: 'default', value: 'default', text: 'default - light', icon: 'teadown light' },
             { key: 'elegant', value: 'elegant', text: 'elegant - light', icon: 'teadown light' },
             { key: 'neo', value: 'neo', text: 'neo - light', icon: 'teadown light' },
+            { key: 'eclipse', value: 'eclipse', text: 'eclipse - light', icon: 'teadown light' },
             { key: 'erlang-dark', value: 'erlang-dark', text: 'erlang - dark', icon: 'teadown dark' },
             { key: 'night', value: 'night', text: 'night - dark', icon: 'teadown dark' },
             { key: 'twilight', value: 'twilight', text: 'twilight - dark', icon: 'teadown dark' },
+            { key: 'dracula', value: 'dracula', text: 'dracula - dark', icon: 'teadown dark' },
         ];
         const keyboardSchema = [
             { key: 'default', value: 'default', text: 'default', icon: 'teadown default' },
@@ -297,6 +318,8 @@ class TeadownLayout extends React.Component {
         //         createdFolder = this.state.cursor.path;
         //     }
         // };
+        // console.log(this.state.settings.editorTheme);
+
         return <Grid>
             <Grid.Row className="teadown-header">
                 <Grid.Column width={8} >
@@ -331,6 +354,8 @@ class TeadownLayout extends React.Component {
                     <span className="teadown-splitter">|</span>
                     <Popup content="Switch editor line wrapping" basic
                         trigger={<Icon name="teadown wrap" color={this.state.lineWrapping ? "olive" : "black"} onClick={this.toggleLineWrap.bind(this)} />} />
+                    <Popup content="Switch editor line number" basic
+                        trigger={<Icon name="ordered list" color={this.state.lineNumber ? "olive" : "black"} onClick={this.toggleLineNumber.bind(this)} />} />
                     <span className="teadown-splitter">|</span>
                     <Popup content="Switch Doc list on/off" basic
                         trigger={<Icon name="list" color={listIconColor} onClick={this.toggleList.bind(this)} />} />
@@ -381,9 +406,10 @@ class TeadownLayout extends React.Component {
                         onValueChange={this.onSrcChange.bind(this)}
                         className="teadown-editor"
                         options={{
-                            keyMap: "default",
+                            theme: this.state.settings.editorTheme || "default",
+                            keyMap: this.state.settings.editorKeymap || "default",
                             mode: "markdown",
-                            lineNumbers: true,
+                            lineNumbers: this.state.lineNumber,
                             lineWrapping: this.state.lineWrapping,
                             matchBrackets: true,
                             autoCloseBrackets: true, autoCloseTags: true,
@@ -429,22 +455,20 @@ class TeadownLayout extends React.Component {
                             <Header>Editor</Header>
                             <Form.Group widths='equal'>
                                 <Form.Field>
-                                    <label>Keyboard schema</label>
-                                    <Select placeholder='Select editor keyboard schema' options={keyboardSchema} />
+                                    <label>Keymap</label>
+                                    <Select placeholder='Select editor keymap'
+                                        value={this.state.settings.editorKeymap || "default"}
+                                        options={keyboardSchema} onChange={(evt, val) => {
+                                            this.onSettingChanged("editorKeymap", val.value);
+                                        }} />
                                 </Form.Field>
                                 <Form.Field>
                                     <label>Theme</label>
-                                    <Select placeholder='Select editor theme' options={editorThemes} />
-                                </Form.Field>
-                            </Form.Group>
-                            <Form.Group widths='equal'>
-                                <Form.Field>
-                                    <label>Line wrapping</label>
-                                    <Radio toggle />
-                                </Form.Field>
-                                <Form.Field>
-                                    <label>Font size</label>
-                                    <Input placeholder='Font size' />
+                                    <Select placeholder='Select editor theme'
+                                        value={this.state.settings.editorTheme || "default"}
+                                        options={editorThemes} onChange={(evt, val) => {
+                                            this.onSettingChanged("editorTheme", val.value);
+                                        }} />
                                 </Form.Field>
                             </Form.Group>
                             <Header>Previewer</Header>

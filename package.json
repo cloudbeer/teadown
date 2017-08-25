@@ -7,6 +7,7 @@
     "start": "electron .",
     "build": "webpack",
     "vendors": "webpack --config webpack.vendor.config.js",
+    "package": "electron-packager . --platform=darwin --arch=x64 --ignore='node_modules|src|\\.gitignore|\\.git'",
     "dev": "webpack --watch"
   },
   "author": "Xie Zhengwei <iam@xiezhengwei.com>",
@@ -21,25 +22,21 @@
     "echarts"
   ],
   "dependencies": {
-    "directory-tree": "^2.0.0",
-    "echarts": "^3.6.2",
-    "electron": "^1.7.5",
+    "uuid": "^3.1.0",
     "markdown-it": "^8.3.2",
     "markdown-it-anchor": "^4.0.0",
     "markdown-it-emoji": "^1.4.0",
     "markdown-it-footnote": "^3.0.1",
     "markdown-it-katex": "^2.0.3",
     "markdown-it-table-of-contents": "^0.3.2",
-    "mermaid": "^7.0.4",
-    "react-codemirror2": "^0.0.13",
-    "react-treebeard": "^2.0.3",
-    "uuid": "^3.1.0"
+    "markdown-it-task-lists": "^2.0.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.1",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
+    "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.28.4",
     "file-loader": "^0.11.2",
     "less": "^2.7.2",
@@ -51,6 +48,12 @@
     "source-map-loader": "^0.2.1",
     "style-loader": "^0.18.2",
     "url-loader": "^0.5.9",
-    "webpack": "^3.5.5"
+    "webpack": "^3.5.5",
+    "directory-tree": "^2.0.0",
+    "echarts": "^3.6.2",
+    "electron": "^1.7.5",
+    "mermaid": "^7.0.4",
+    "react-codemirror2": "^0.0.13",
+    "react-treebeard": "^2.0.3"
   }
 }

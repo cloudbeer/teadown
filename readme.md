@@ -33,10 +33,11 @@ features:
 - [footnote](http://pandoc.org/MANUAL.html#footnotes)
 - toc: Table of Content
 - [echart](http://echarts.baidu.com/): 百度图表
+- [task-lists](https://github.com/blog/1825-task-lists-in-all-markdown-documents)
 
 ## Editor
 
-- codemirror editor
+- [codemirror editor](https://codemirror.net/)
 
 
 
