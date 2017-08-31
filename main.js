@@ -115,7 +115,7 @@ ipcMain.on("onSettingChanged", (event, arg) => {
 
 ipcMain.on('reqFiles', (event, arg) => {
   util.loadFileTree(event, appConfig.docRoot);
-  event.sender.send('resFolderChoose', docRoot); //TODO: What is this
+  //event.sender.send('resFolderChoose', docRoot); //TODO: What is this
 });
 
 ipcMain.on("docReadToEdit", (event, arg) => {

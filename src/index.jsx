@@ -50,11 +50,19 @@ import { ipcRenderer } from "electron";
 
 const mermaid = require("mermaid");
 const echarts = require('echarts');
+const i18n = require("./i18n/");
+
+let lang = i18n.en;
 
 class TeadownLayout extends React.Component {
 
     constructor(props) {
         super(props);
+
+        const myLang = navigator.language;
+        if (myLang && i18n.hasOwnProperty(myLang.toLowerCase())) {
+            Object.assign(lang, i18n[myLang.toLowerCase()]);
+        }
         this.state = {
             settings: {
                 docRoot: "",
@@ -68,7 +76,7 @@ class TeadownLayout extends React.Component {
             showStyle: 5,
             source: "",
             htmlData: `<div style="padding:20px;font-size:20px">
-            teadown is a Markdown Editor and Previewer
+            ${lang.CT_Welcome}
             </div>`,
             settingsOpen: false,
             cursor: null,
@@ -77,6 +85,8 @@ class TeadownLayout extends React.Component {
             newFolderName: "",
             currentPath: ""
         };
+
+
 
         // this.maxId = 0;
         this.srcChanged = false;
@@ -124,11 +134,12 @@ class TeadownLayout extends React.Component {
             this.setState(upState);
         });
 
-        ipcRenderer.on("resFolderChoose", (evt, arg) => {
-            let settings = this.state.settings;
-            settings.docRoot = arg;
-            this.setState({ settings: settings });
-        });
+        // ipcRenderer.on("resFolderChoose", (evt, arg) => {
+        //     let settings = this.state.settings;
+        //     console.log("resFolderChoose:", arg);
+        //     settings.docRoot = arg;
+        //     this.setState({ settings: settings });
+        // });
         // ipcRenderer.on("resCurrentPath", (evt, arg) => {
         //     const thisNode = findNode()
         //     console.log(arg);
@@ -185,7 +196,6 @@ class TeadownLayout extends React.Component {
     componentDidMount() {
         this.updateDimensions();
         window.addEventListener("resize", this.updateDimensions.bind(this));
-        console.log("I am started here.");
         mermaid.initialize({
             startOnLoad: true
         });
@@ -291,17 +301,17 @@ class TeadownLayout extends React.Component {
         const editorIconColor = (this.state.showStyle & 2) === 2 ? highlight : normalCl;
         const browserIconColor = (this.state.showStyle & 4) === 4 ? highlight : normalCl;
         const editorThemes = [
-            { key: 'default', value: 'default', text: 'default - light', icon: 'teadown light' },
-            { key: 'elegant', value: 'elegant', text: 'elegant - light', icon: 'teadown light' },
-            { key: 'neo', value: 'neo', text: 'neo - light', icon: 'teadown light' },
-            { key: 'eclipse', value: 'eclipse', text: 'eclipse - light', icon: 'teadown light' },
-            { key: 'erlang-dark', value: 'erlang-dark', text: 'erlang - dark', icon: 'teadown dark' },
-            { key: 'night', value: 'night', text: 'night - dark', icon: 'teadown dark' },
-            { key: 'twilight', value: 'twilight', text: 'twilight - dark', icon: 'teadown dark' },
-            { key: 'dracula', value: 'dracula', text: 'dracula - dark', icon: 'teadown dark' },
+            { key: 'default', value: 'default', text: lang.LB_Default + ' - ' + lang.LB_Light, icon: 'teadown light' },
+            { key: 'twilight', value: 'twilight', text: 'twilight - ' + lang.LB_Dark, icon: 'teadown dark' },
+            { key: 'elegant', value: 'elegant', text: 'elegant - ' + lang.LB_Light, icon: 'teadown light' },
+            { key: 'erlang-dark', value: 'erlang-dark', text: 'erlang - ' + lang.LB_Dark, icon: 'teadown dark' },
+            { key: 'neo', value: 'neo', text: 'neo - ' + lang.LB_Light, icon: 'teadown light' },
+            { key: 'night', value: 'night', text: 'night - ' + lang.LB_Dark, icon: 'teadown dark' },
+            { key: 'eclipse', value: 'eclipse', text: 'eclipse - ' + lang.LB_Light, icon: 'teadown light' },
+            { key: 'dracula', value: 'dracula', text: 'dracula - ' + lang.LB_Dark, icon: 'teadown dark' },
         ];
         const keyboardSchema = [
-            { key: 'default', value: 'default', text: 'default', icon: 'teadown default' },
+            { key: 'default', value: 'default', text: lang.LB_Default, icon: 'teadown default' },
             { key: 'sublime', value: 'sublime', text: 'sublime', icon: 'teadown sublime' },
             { key: 'vim', value: 'vim', text: 'vim', icon: 'teadown vim' },
             { key: 'emacs', value: 'emacs', text: 'emacs', icon: 'teadown emacs' }
@@ -318,7 +328,7 @@ class TeadownLayout extends React.Component {
         //         createdFolder = this.state.cursor.path;
         //     }
         // };
-        // console.log(this.state.settings.editorTheme);
+        //  console.log(this.state.settings);
 
         return <Grid>
             <Grid.Row className="teadown-header">
@@ -329,21 +339,21 @@ class TeadownLayout extends React.Component {
                 <Grid.Column textAlign="right" width={8} className="toolbar">
                     <Popup basic flowing hoverable
                         trigger={<Icon name="file outline" />}>
-                        <Header as="h4">Create new file</Header>
+                        <Header as="h4">{lang.TT_CreateFile}</Header>
                         <div>@{createdFolder}/</div>
                         <Form>
-                            <Form.Input placeholder='New folder name, you can leave empty.'
+                            <Form.Input placeholder={lang.TT_NewFolder}
                                 value={this.state.newFolderName}
                                 onChange={(evt, val) => { this.onInputValueChanged("newFolderName", val.value) }} />
-                            <Form.Input placeholder='New file name, leave empty will only create folder.'
+                            <Form.Input placeholder={lang.TT_NewFile}
                                 value={this.state.newFileName}
                                 onChange={(evt, val) => { this.onInputValueChanged("newFileName", val.value) }} />
-                            <Form.Button onClick={this.onAddMdClick.bind(this)}>Create</Form.Button>
+                            <Form.Button onClick={this.onAddMdClick.bind(this)}>{lang.LB_Create}</Form.Button>
                         </Form>
                     </Popup>
                     {
                         (this.state.settings.docRoot !== this.state.currentPath) ?
-                            <Popup content="Delete file/folder" basic
+                            <Popup content={lang.LB_Delete} basic
                                 trigger={<Icon name="trash" onClick={this.onDeleteFile.bind(this)} />} /> : null
                     }
                     {
@@ -352,26 +362,26 @@ class TeadownLayout extends React.Component {
                                 trigger={<Icon name="file pdf outline" />} /> : null
                     }
                     <span className="teadown-splitter">|</span>
-                    <Popup content="Switch editor line wrapping" basic
+                    <Popup content={lang.TP_LineWrappingToggle} basic
                         trigger={<Icon name="teadown wrap" color={this.state.lineWrapping ? "olive" : "black"} onClick={this.toggleLineWrap.bind(this)} />} />
-                    <Popup content="Switch editor line number" basic
+                    <Popup content={lang.TP_LineNumberToggle} basic
                         trigger={<Icon name="ordered list" color={this.state.lineNumber ? "olive" : "black"} onClick={this.toggleLineNumber.bind(this)} />} />
                     <span className="teadown-splitter">|</span>
-                    <Popup content="Switch Doc list on/off" basic
+                    <Popup content={lang.TP_FileListToggle} basic
                         trigger={<Icon name="list" color={listIconColor} onClick={this.toggleList.bind(this)} />} />
                     {
                         this.state.currentPath.lastIndexOf(".md") > 0 ?
-                            <Popup content="Switch editor on/off" basic
+                            <Popup content={lang.TP_EditorToggle} basic
                                 trigger={<Icon name="edit" color={editorIconColor} onClick={this.toggleEditor.bind(this)} />} /> : null
                     }
-                    <Popup content="Switch preview on/off" basic
+                    <Popup content={lang.TP_PreviewerToggle} basic
                         trigger={<Icon name="chrome" loading={browserIconColor === highlight} color={browserIconColor} onClick={this.togglePreviewer.bind(this)} />} />
                     <span className="teadown-splitter">|</span>
-                    <Popup content="Settings" basic
+                    <Popup content={lang.LB_Settings} basic
                         trigger={<Icon name="settings"
                             onClick={() => { this.setState({ settingsOpen: true }) }} />} />
-                    <Popup content="Help" basic
-                        trigger={<Icon name="help" />} />
+                    <Popup content={lang.LB_Help} basic
+                        trigger={<Icon name="github alternate" onClick={()=>{window.open("https://github.com/cloudbeer/teadown")}} />} />
 
                 </Grid.Column>
             </Grid.Row>
@@ -434,28 +444,28 @@ class TeadownLayout extends React.Component {
                 }
             </Grid.Row>
             <Modal dimmer="blurring" open={this.state.settingsOpen} onClose={this.onSettingsClose.bind(this)}>
-                <Modal.Header>Settings</Modal.Header>
+                <Modal.Header>{lang.LB_Settings}</Modal.Header>
                 <Modal.Content>
                     <Modal.Description>
                         <Form>
-                            <Header>System</Header>
+                            <Header>{lang.LB_System}</Header>
                             <Form.Group widths='equal'>
                                 <Form.Field>
-                                    <label>Document folder</label>
+                                    <label>{lang.LB_MDFolder}</label>
                                     <Input value={this.state.settings.docRoot}
                                         icon={<Icon onClick={this.onBrowseFolderClick.bind(this)} name='search' inverted circular link />} />
                                 </Form.Field>
                                 <Form.Field>
-                                    <label>Auto save after stop type</label>
+                                    <label>{lang.LB_AutoSaveLabel}</label>
                                     <Input value={this.state.settings.autoSaveInteval}
                                         label={{ icon: 'clock' }}
                                         onChange={(evt, val) => { this.onSettingChanged("autoSaveInteval", val.value) }} />
                                 </Form.Field>
                             </Form.Group>
-                            <Header>Editor</Header>
+                            <Header>{lang.LB_Editor}</Header>
                             <Form.Group widths='equal'>
                                 <Form.Field>
-                                    <label>Keymap</label>
+                                    <label>{lang.LB_KeyMap}</label>
                                     <Select placeholder='Select editor keymap'
                                         value={this.state.settings.editorKeymap || "default"}
                                         options={keyboardSchema} onChange={(evt, val) => {
@@ -463,7 +473,7 @@ class TeadownLayout extends React.Component {
                                         }} />
                                 </Form.Field>
                                 <Form.Field>
-                                    <label>Theme</label>
+                                    <label>{lang.LB_Theme}</label>
                                     <Select placeholder='Select editor theme'
                                         value={this.state.settings.editorTheme || "default"}
                                         options={editorThemes} onChange={(evt, val) => {
@@ -471,7 +481,7 @@ class TeadownLayout extends React.Component {
                                         }} />
                                 </Form.Field>
                             </Form.Group>
-                            <Header>Previewer</Header>
+                            {/* <Header>Previewer</Header>
                             <Form.Group widths='equal'>
                                 <Form.Field>
                                     <label>Theme</label>
@@ -481,13 +491,13 @@ class TeadownLayout extends React.Component {
                                     <label>Background</label>
                                     <Input placeholder='Document folder' />
                                 </Form.Field>
-                            </Form.Group>
+                            </Form.Group> */}
                         </Form>
                     </Modal.Description>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button color='black' onClick={this.onSettingsClose.bind(this)}>Cancel</Button>
-                    <Button positive icon='save' labelPosition='right' content="Save" onClick={this.onSettingsSave.bind(this)} />
+                    <Button color='black' onClick={this.onSettingsClose.bind(this)}>{lang.LB_Cancel}</Button>
+                    <Button positive icon='save' labelPosition='right' content={lang.LB_Save} onClick={this.onSettingsSave.bind(this)} />
                 </Modal.Actions>
             </Modal>
         </Grid>

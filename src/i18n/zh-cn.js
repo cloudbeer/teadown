@@ -1,0 +1,27 @@
+module.exports = {
+  LB_MDFolder: "文件夹目录",
+  LB_AutoSaveLabel: "自动保存，当你停止输入的秒数",
+  LB_KeyMap: "键盘映射",
+  LB_Delete: "删除",
+  LB_Settings: "设置",
+  LB_Help: "帮助",
+  LB_Editor: "编辑器",
+  LB_Theme: "主题",
+  LB_Default: "默认",
+  LB_Dark: "暗的",
+  LB_Light: "亮的",
+  LB_Create: "创建",
+  LB_System: "系统",
+  LB_Cancel: "取消",
+  LB_Save: "保存",
+  TP_FileListToggle: "文档列表开关",
+  TP_EditorToggle: "编辑器开关",
+  TP_PreviewerToggle: "预览开关",
+  TP_LineWrappingToggle: "自动换行开关",
+  TP_LineNumberToggle: "行号开关",
+  TT_CreateFile: "创建新的 markdown 文档",
+  TT_NewFolder: "创建新文件夹，留空则不创建",
+  TT_NewFile: "创建新文件，留空则不创建",
+  CT_Welcome: "teadown 是一个牛逼又好用的 markdown 文档编辑和预览工具"
+
+};
