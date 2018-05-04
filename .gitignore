@@ -41,5 +41,5 @@
 /vendor/node/deps/node-inspect/.npmrc
 /vendor/npm/
 /vendor/python_26/
-teadown-darwin-x64/
 packages/
+realse-builds/

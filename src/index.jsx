@@ -134,12 +134,12 @@ class TeadownLayout extends React.Component {
             this.setState(upState);
         });
 
-        // ipcRenderer.on("resFolderChoose", (evt, arg) => {
-        //     let settings = this.state.settings;
-        //     console.log("resFolderChoose:", arg);
-        //     settings.docRoot = arg;
-        //     this.setState({ settings: settings });
-        // });
+        ipcRenderer.on("resFolderChoose", (evt, arg) => {
+            if (!arg) return;
+            let settings = this.state.settings;            
+            settings.docRoot = arg;
+            this.setState({ settings: settings });
+        });
         // ipcRenderer.on("resCurrentPath", (evt, arg) => {
         //     const thisNode = findNode()
         //     console.log(arg);
